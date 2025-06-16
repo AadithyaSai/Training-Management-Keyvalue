@@ -32,21 +32,22 @@ export default function validRoles(allowedRoles: string[]) {
     return false;
   }
 
-  return async function (
-    error: Error,
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) {
-    if (!req.user) {
-      throw new HTTPException(401, "No such user");
-    }
+  return async function (req: Request, res: Response, next: NextFunction) {
+    try {
+      if (!req.user) {
+        throw new HTTPException(401, "No such user");
+      }
 
-    const id = req.user.id;
-    const sessionId = parseInt(req.params.sessionId, 10) || null; // will only be present in some session endpoints. null otherwise
-    if (!(await checkAccess(allowedRoles, id, sessionId))) {
-      throw new HTTPException(403, "Forbidden");
+      const id = req.user.id;
+      const sessionId = parseInt(req.params.sessionId, 10) || null; // will only be present in some session endpoints. null otherwise
+
+      if (!(await checkAccess(allowedRoles, id, sessionId))) {
+        throw new HTTPException(403, "Forbidden");
+      }
+
+      next();
+    } catch (error) {
+      next(error);
     }
-    next();
   };
 }
