@@ -5,6 +5,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import LoggerService from "./logger.service";
 import { User } from "../entities/user.entity";
+import { StringValue } from "ms";
 
 export class AuthService {
 	private logger = LoggerService.getInstance(UserService.name);
@@ -12,7 +13,7 @@ export class AuthService {
 	constructor(private userService: UserService) {}
 
 	async login(username: string, password: string) {
-		const user:User = await this.userService.findOneByUsername(username);
+		const user: User = await this.userService.findOneByUsername(username);
 		if (!user) {
 			throw new Error("Invalid username or password");
 		}
@@ -32,7 +33,7 @@ export class AuthService {
 			};
 
 			const token: string = jwt.sign(payload, JWT_SECRET, {
-				expiresIn: JWT_VALIDITY,
+				expiresIn: JWT_VALIDITY as StringValue,
 			});
 			return {
 				tokenType: "Bearer",
