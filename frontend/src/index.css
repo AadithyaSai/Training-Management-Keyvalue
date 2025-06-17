@@ -1,18 +1,17 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
 @import "tailwindcss";
 
 @theme {
-  --color-bgColor: #0A0A0A;
+  --color-bgColor: #0a0a0a;
   --color-cardColor: #121212;
   --color-borderColor: #2d2e2e;
-  --color-itemColor: #1E1E1E;
+  --color-itemColor: #1e1e1e;
   --color-modalBgColor: rgba(10, 10, 10, 0.7);
 
   --spacing-headerHeight: 120px;
   --spacing-navbarWidth: 350px;
   --spacing-bodyHeight: calc(100vh - var(--spacing-headerHeight));
   --spacing-bodyWidth: calc(100vw - var(--spacing-navbarWidth));
-
 }
 
 * {
@@ -24,4 +23,16 @@ body {
   padding: 0;
   box-sizing: border-box;
   background-color: #111111;
+}
+
+@layer utilities {
+  /* Chrome, Safari and Opera */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
 }
