@@ -10,9 +10,9 @@ const dataSource = new DataSource({
 	password: process.env.DB_PASSWORD,
 	port: Number(process.env.DB_PORT),
 	database: process.env.DB_NAME,
-	// ssl: {
-	// 	rejectUnauthorized: process.env.DB_SSL == "true" ? true : false,
-	// },
+	ssl: {
+		rejectUnauthorized: false,
+	},
 	extra: {
 		max: 5,
 		min: 2,
