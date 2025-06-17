@@ -18,6 +18,7 @@ export class MaterialRepository {
     });
   }
 
+
   async getAll(): Promise<Material[]> {
     return this.repository.find({
       relations: {

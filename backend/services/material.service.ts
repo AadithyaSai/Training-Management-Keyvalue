@@ -29,6 +29,7 @@ export class MaterialService {
     }
     return material;
   }
+
   async deleteMaterial(id: number): Promise<void> {
     const material = await this.materialRepository.getById(id);
     if (!material) {
@@ -52,3 +53,4 @@ export class MaterialService {
           return result;
         } 
 }
+

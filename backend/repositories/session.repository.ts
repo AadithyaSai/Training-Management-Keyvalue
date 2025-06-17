@@ -1,5 +1,5 @@
-import { Repository } from "typeorm";
-import { Session } from "../entities/session.entity";
+import { Between, Repository } from "typeorm";
+import { Session, Status } from "../entities/session.entity";
 import { User } from "../entities/user.entity";
 import { Material } from "../entities/material.entity";
 import { UserSession } from "../entities/user-session.entity";
@@ -24,6 +24,41 @@ class SessionRepository {
       },
     });
   }
+   async findUpcomingSessions(): Promise<Session[]> {
+  return this.repository.find({
+    where: {
+      status: "Scheduled" as Status,
+    },
+    relations: {
+      training: true,
+      userSessions: {
+        user: true,
+      },
+      materials: true,
+    },
+  });
+}
+
+async findTodaySessions(): Promise<Session[]> {
+  const today = new Date();
+  const startOfDay = new Date(today.setHours(0, 0, 0, 0));
+  const endOfDay = new Date(today.setHours(23, 59, 59, 999));
+  console.log("helooooooooo",startOfDay)
+  return this.repository.find({
+    where: {
+      startTime: Between(startOfDay, endOfDay),
+      status: "Scheduled" as Status,
+    },
+    relations: {
+      training: true,
+      userSessions: {
+        user: true,
+      },
+      materials: true,
+    },
+  });
+}
+
 
 //   // Get sessions where a user is a participant
 //   async findByUserId(userId: number): Promise<Session[]> {
