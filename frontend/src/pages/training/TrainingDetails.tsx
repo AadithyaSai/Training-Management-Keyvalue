@@ -1,9 +1,10 @@
 import { useParams } from "react-router-dom";
 import { DashboardCardType } from "../../components/dashboardCard/DashboardCard";
 import DashboardCardList from "../../components/dashboardCardList/DashboardCardList";
-import EventList from "../../components/eventList/EventList";
+import EventList, { formatTrainingList } from "../../components/eventList/EventList";
 import Layout from "../../components/layout/Layout";
 import TimelineProgressBar from "../../components/progressBar/timelineProgressBar/TimelineProgressBar";
+import { useGetTrainingByIdQuery, useGetTrainingListQuery } from "../../api-service/training/training.api";
 
 const dummyDashboardData = [
     {
@@ -33,9 +34,15 @@ const dummyDashboardData = [
 ];
 
 const TrainingDetails = () => {
-    const { name } = useParams();
+    const { trainingId } = useParams();
+    
+    const { data: trainingDetails } = useGetTrainingByIdQuery({ id: trainingId });
+    
+    if(!trainingDetails)
+        return (<></>);
+
     return (
-        <Layout title={name}>
+        <Layout title={trainingDetails.title}>
             <div className="flex flex-col items-center justify-center gap-10 p-5">
                 <DashboardCardList
                     data={[
@@ -59,7 +66,7 @@ const TrainingDetails = () => {
                     heading="Sessions"
                     showCreateButton={true}
                     onCreateClick={() => console.log("Create program clicked")}
-                    data={dummyDashboardData}
+                    data={formatTrainingList(trainingDetails.sessions)}
                 />
             </div>
         </Layout>

@@ -1,28 +1,10 @@
 import { useNavigate } from "react-router-dom";
-import DashboardCardList from "../../components/dashboardCardList/DashboardCardList";
-import EventList from "../../components/eventList/EventList";
-import Layout from "../../components/layout/Layout";
 import { useGetTrainingListQuery } from "../../api-service/training/training.api";
-import type { EventProps } from "react-big-calendar";
+import type { EventProps } from "../../components/eventList/EventList";
+import DashboardCardList from "../../components/dashboardCardList/DashboardCardList";
+import EventList, { formatTrainingList } from "../../components/eventList/EventList";
+import Layout from "../../components/layout/Layout";
 
-const formatTrainingList = (trainingDetailsList: Array<EventProps>) => {
-    if (!trainingDetailsList) return;
-    const formattedTrainingList = trainingDetailsList.map(
-        (trainingDetails: any) => {
-            return {
-                id: trainingDetails.id,
-                title: trainingDetails.title,
-                description: trainingDetails.description,
-                startDate: trainingDetails.startDate,
-                endDate: trainingDetails.endDate,
-                status: "Active",
-                // totalSessions: 7,
-                // progress: 30,
-            };
-        }
-    );
-    return formattedTrainingList;
-};
 
 const AdminDashboard = () => {
     const navigate = useNavigate();

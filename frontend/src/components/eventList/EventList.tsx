@@ -4,14 +4,22 @@ import { CiPlay1 } from "react-icons/ci";
 import { FaSearch } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
-type EventProps = {
+const EventStatusType = {
+    DEFAULT: "All",
+    IN_PROGRESS: "InProgress",
+    SCHEDULED: "Scheduled",
+    DRAFT: "Draft",
+    COMPLETED: "Completed",
+} as const;
+
+export type EventProps = {
     id: number;
     title: string;
     description: string;
     startDate: string;
     endDate: string;
     duration?: string;
-    status?: string;
+    status?: (typeof EventStatusType)[keyof typeof EventStatusType];
     trainer?: string;
     totalSessions?: number;
     progress?: number;
@@ -29,6 +37,23 @@ type EventListProps = {
     data?: EventProps[];
 };
 
+export const formatTrainingList = (trainingDetailsList: Array<EventProps>) => {
+    if (!trainingDetailsList) return;
+    const formattedTrainingList = trainingDetailsList.map(
+        (trainingDetails: EventProps) => {
+            return {
+                id: trainingDetails.id,
+                title: trainingDetails.title,
+                description: trainingDetails.description,
+                startDate: trainingDetails.startDate,
+                endDate: trainingDetails.endDate,
+                status: trainingDetails?.status,
+            };
+        }
+    );
+    return formattedTrainingList;
+};
+
 const EventListItem: React.FC<EventItem> = ({ item, heading }) => {
     const navigate = useNavigate();
     return (
@@ -38,15 +63,31 @@ const EventListItem: React.FC<EventItem> = ({ item, heading }) => {
         >
             <div className="flex items-center justify-between">
                 <h3 className="text-xl font-semibold">{item.title}</h3>
-                {/* <span className="text-sm text-green-400 flex items-center gap-1">
-                    <CiPlay1 />
-                    <p>{item.status}</p>
-                </span> */}
+                {item.status && (
+                    <span className="text-sm text-green-400 flex items-center gap-1">
+                        <CiPlay1 />
+                        <p>{item.status}</p>
+                    </span>
+                )}
             </div>
             <div className="flex flex-col gap-1 mt-2">
                 <p className="text-sm mt-1 text-gray-400">{item.description}</p>
-                <p className="text-sm mt-1">Start date : {dayjs(item.startDate).format('DD/MM/YYYY')}</p>
-                <p className="text-sm mt-1">End date : {dayjs(item.endDate).format('DD/MM/YYYY')}</p>
+                {heading == "session" ? (
+                    <p className="text-sm mt-1">
+                        Date : {dayjs(item.startDate).format("DD/MM/YYYY")}
+                    </p>
+                ) : (
+                    <>
+                        <p className="text-sm mt-1">
+                            Start date :{" "}
+                            {dayjs(item.startDate).format("DD/MM/YYYY")}
+                        </p>
+                        <p className="text-sm mt-1">
+                            End date :{" "}
+                            {dayjs(item.endDate).format("DD/MM/YYYY")}
+                        </p>
+                    </>
+                )}
                 {item.trainer && (
                     <p className="text-sm mt-1">Trainer : {item.trainer}</p>
                 )}
@@ -77,14 +118,16 @@ const EventList: React.FC<EventListProps> = ({
     onCreateClick,
     data,
 }) => {
-    const [statusFilter, setStatusFilter] = useState("Active");
+    const [statusFilter, setStatusFilter] = useState(
+        String(EventStatusType.IN_PROGRESS)
+    );
     const [searchTerm, setSearchTerm] = useState("");
-    if(!data)
-        return (<></>);
+    if (!data) return <></>;
     const filteredData = (data || []).filter(
         (item) =>
             item.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
-            (statusFilter.toLowerCase() == "all" ||
+            (heading == "Programs" ||
+                statusFilter.toLowerCase() == "all" ||
                 item.status === statusFilter)
     );
     return (
@@ -102,24 +145,46 @@ const EventList: React.FC<EventListProps> = ({
                             </button>
                         )}
 
-                        <select
-                            className="bg-itemColor border border-borderColor px-3 py-2 rounded"
-                            value={statusFilter}
-                            onChange={(e) => setStatusFilter(e.target.value)}
-                        >
-                            <option className="bg-itemColor" value="Active">
-                                Active
-                            </option>
-                            <option className="bg-itemColor" value="Scheduled">
-                                Scheduled
-                            </option>
-                            <option className="bg-itemColor" value="Completed">
-                                Completed
-                            </option>
-                            <option className="bg-itemColor" value="All">
-                                All
-                            </option>
-                        </select>
+                        {heading == "Sessions" && (
+                            <select
+                                className="bg-itemColor border border-borderColor px-3 py-2 rounded"
+                                value={statusFilter}
+                                onChange={(e) =>
+                                    setStatusFilter(e.target.value)
+                                }
+                            >
+                                <option
+                                    className="bg-itemColor"
+                                    value={EventStatusType.IN_PROGRESS}
+                                >
+                                    InProgress
+                                </option>
+                                <option
+                                    className="bg-itemColor"
+                                    value={EventStatusType.SCHEDULED}
+                                >
+                                    Scheduled
+                                </option>
+                                <option
+                                    className="bg-itemColor"
+                                    value={EventStatusType.DRAFT}
+                                >
+                                    Draft
+                                </option>
+                                <option
+                                    className="bg-itemColor"
+                                    value={EventStatusType.COMPLETED}
+                                >
+                                    Completed
+                                </option>
+                                <option
+                                    className="bg-itemColor"
+                                    value={EventStatusType.DEFAULT}
+                                >
+                                    All
+                                </option>
+                            </select>
+                        )}
 
                         <div className="flex items-center border border-borderColor rounded px-2 bg-itemColor shadow-2xl">
                             <input

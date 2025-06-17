@@ -36,7 +36,7 @@ const router = createBrowserRouter([
                 element: <NotFound />,
             },
             {
-                path: ":name",
+                path: ":trainingId",
                 element: <TrainingDetails />,
             },
             {
