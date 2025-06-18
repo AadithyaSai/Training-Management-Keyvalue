@@ -11,6 +11,7 @@ import sessionRouter from "./routes/session.routes";
 import materialRouter from "./routes/material.route";
 import trainingRouter from "./routes/training.route";
 import feedbackRouter from "./routes/feedback.routes";
+import assignmentRouter from "./routes/assignment.routes";
 
 const PORT = 3000;
 
@@ -29,11 +30,12 @@ server.get("/health", (req, res) => {
 // Import routes
 server.use("/auth", authRouter);
 server.use(authMiddleware);
-server.use("/session", sessionRouter);
 server.use("/users", userRouter);
-server.use("/material", materialRouter);
 server.use("/trainings", trainingRouter);
-server.use("/feedback", feedbackRouter);
+server.use("/session", sessionRouter);
+server.use("/session/:sessionId/material", materialRouter);
+server.use("/session/:sessionId/feedback", feedbackRouter);
+server.use("/session/:sessionId/assignments", assignmentRouter);
 
 server.use(errorMiddleware);
 

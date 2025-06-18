@@ -13,7 +13,7 @@ const materialRepository = new MaterialRepository(
 const materialService = new MaterialService(materialRepository, sessionService);
 const materialController = new MaterialController(materialService);
 
-const materialRouter = Router();
+const materialRouter = Router({ mergeParams: true });
 
 materialRouter.post(
   "/",

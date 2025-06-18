@@ -39,6 +39,7 @@ trainingRouter.patch(
   validRoles([AuthRoles.TRAINING_ADMIN]),
   trainingController.updateTraining.bind(trainingController)
 );
+
 trainingRouter.delete(
   "/:id",
   validRoles([AuthRoles.TRAINING_ADMIN]),

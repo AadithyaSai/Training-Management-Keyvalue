@@ -1,12 +1,13 @@
 import { Request, Response, NextFunction } from "express";
 
-import HTTPException from "../exceptions/http.exception";
 import { SessionService } from "../services/session.service";
 import { CreateSessionDto, UpdateSessionDto } from "../dto/session.dto";
 import { plainToInstance } from "class-transformer";
 import { validate } from "class-validator";
-import { CreateUserSessionDto, DeleteUserSessionDto } from "../dto/user-session.dto";
-import { UserSession } from "../entities/user-session.entity";
+import {
+  CreateUserSessionDto,
+  DeleteUserSessionDto,
+} from "../dto/user-session.dto";
 
 export class SessionController {
   constructor(private sessionService: SessionService) {}
@@ -51,7 +52,9 @@ export class SessionController {
   async getTodaySessions(req: Request, res: Response, next: NextFunction) {
     try {
       const users = await this.sessionService.getTodaySessions();
-      console.log("hellllllllllllllllllllllllllllllllllllllllllllooooooooooooooooooooo  Scontrollererrrrrrr");
+      console.log(
+        "hellllllllllllllllllllllllllllllllllllllllllllooooooooooooooooooooo  Scontrollererrrrrrr"
+      );
       res.status(200).json(users);
     } catch (error) {
       next(error);
@@ -60,7 +63,7 @@ export class SessionController {
 
   async getSessionById(req: Request, res: Response, next: NextFunction) {
     try {
-      const sessionId = parseInt(req.params.id, 10);
+      const sessionId = parseInt(req.params.sessionId, 10);
       const session = await this.sessionService.findOneById(sessionId);
 
       res.status(200).json(session);
@@ -70,7 +73,7 @@ export class SessionController {
   }
   async deleteSession(req: Request, res: Response, next: NextFunction) {
     try {
-      const userId = parseInt(req.params.id, 10);
+      const userId = parseInt(req.params.sessionId, 10);
       await this.sessionService.deleteSession(userId);
 
       res.status(204).send();
@@ -80,7 +83,7 @@ export class SessionController {
   }
   async updateSession(req: Request, res: Response, next: NextFunction) {
     try {
-      const sessionId = parseInt(req.params.id, 10);
+      const sessionId = parseInt(req.params.sessionId, 10);
       const sessionDto = plainToInstance(UpdateSessionDto, req.body);
 
       const errors = await validate(sessionDto);
@@ -103,9 +106,9 @@ export class SessionController {
   }
   async addUsersToSession(req: Request, res: Response, next: NextFunction) {
     try {
-      const session_id = parseInt(req.params.id, 10);
+      const session_id = parseInt(req.params.sessionId, 10);
       const userSessionDto = plainToInstance(CreateUserSessionDto, req.body);
-      const userSessions= await this.sessionService.addUsersToSession(
+      const userSessions = await this.sessionService.addUsersToSession(
         session_id,
         userSessionDto
       );
@@ -124,20 +127,22 @@ export class SessionController {
       next(error);
     }
   }
-  async removeUsersFromSession(req: Request, res: Response, next: NextFunction) {
+  async removeUsersFromSession(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
     try {
-      const sessionId = parseInt(req.params.id, 10);
-      const userSessionDto=plainToInstance(DeleteUserSessionDto, req.body)
-      await this.sessionService.removeUsersFromSession(sessionId,userSessionDto);
+      const sessionId = parseInt(req.params.sessionId, 10);
+      const userSessionDto = plainToInstance(DeleteUserSessionDto, req.body);
+      await this.sessionService.removeUsersFromSession(
+        sessionId,
+        userSessionDto
+      );
 
       res.status(204).send();
     } catch (error) {
       next(error);
     }
   }
-
-   
-  
-
-
 }

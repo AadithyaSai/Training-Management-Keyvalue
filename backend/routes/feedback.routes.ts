@@ -7,15 +7,15 @@ import dataSource from "../db/dataSource";
 import { Feedback } from "../entities/feedback.entity";
 
 const feedbackRepository = new FeedbackRepository(
-	dataSource.getRepository(Feedback)
+  dataSource.getRepository(Feedback)
 );
 
 const feedbackService = new FeedbackService(feedbackRepository);
 
-const feedbackRouter = express.Router();
+const feedbackRouter = express.Router({ mergeParams: true });
 const feedbackController = new FeedbackController(
-	feedbackService,
-	feedbackRouter
+  feedbackService,
+  feedbackRouter
 );
 
 export default feedbackRouter;
