@@ -24,18 +24,18 @@ export class SessionService {
 		private userSessionRepository: UserSessionRepository
 	) {}
 
-  async createSession(sessionDto: CreateSessionDto): Promise<Session> {
-    const session = plainToInstance(Session, instanceToPlain(sessionDto));
-    const training = await this.trainingService.getTrainingById(
-      sessionDto.programId
-    );
-    if (training) {
-      session.training = training;
-    } else {
-      throw new HTTPException(400, "No such training");
-    }
-    const result = await this.sessionRepository.create(session);
-    this.logger.info(`Session created with ID: ${result.id}`);
+	async createSession(sessionDto: CreateSessionDto): Promise<Session> {
+		const session = plainToInstance(Session, instanceToPlain(sessionDto));
+		const training = await this.trainingService.getTrainingById(
+			sessionDto.programId
+		);
+		if (training) {
+			session.training = training;
+		} else {
+			throw new HTTPException(400, "No such training");
+		}
+		const result = await this.sessionRepository.create(session);
+		this.logger.info(`Session created with ID: ${result.id}`);
 
 		return result;
 	}
@@ -86,10 +86,10 @@ export class SessionService {
 			instanceToPlain(sessionDto)
 		);
 		sessionData.training = await this.trainingService.getTrainingById(
-			sessionDto.program_id
+			sessionDto.programId
 		);
 		const training = await this.trainingService.getTrainingById(
-			sessionDto.program_id
+			sessionDto.programId
 		);
 		if (training) {
 			sessionData.training = training;

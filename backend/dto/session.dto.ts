@@ -41,7 +41,7 @@ export class UpdateSessionDto {
 
 	@IsOptional()
 	@IsNumber()
-	program_id?: number;
+	programId?: number;
 
 	@IsOptional()
 	@IsString()
