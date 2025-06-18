@@ -8,6 +8,7 @@ import {
   CreateAssignmentDto,
   UpdateAssignmentDto,
 } from "../dto/assignment.dto";
+import { uploadFile } from "../utils/cloud";
 
 export default class AssignmentController {
   constructor(private assignmentService: AssignmentService) {}
@@ -16,6 +17,9 @@ export default class AssignmentController {
     try {
       const sessionId = parseInt(req.params.sessionId, 10);
       const assignmentData = plainToInstance(CreateAssignmentDto, req.body);
+      if (req.file) {
+        assignmentData.referenceUrl = await uploadFile(req.file, "assignments");
+      }
 
       const errors = await validate(assignmentData);
       if (errors.length > 0) {
@@ -66,7 +70,9 @@ export default class AssignmentController {
     try {
       const assignmentId = parseInt(req.params.id, 10);
       const updateData = plainToInstance(UpdateAssignmentDto, req.body);
-
+      if (req.file) {
+        updateData.referenceUrl = await uploadFile(req.file, "assignments");
+      }
       const errors = await validate(updateData);
       if (errors.length > 0) {
         return res.status(400).json({

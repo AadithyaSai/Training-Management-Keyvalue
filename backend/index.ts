@@ -24,7 +24,7 @@ server.use(express.json());
 
 // Global routes
 server.get("/health", (req, res) => {
-  res.status(200).json({ message: "Server is healthy" });
+	res.status(200).json({ message: "Server is healthy" });
 });
 
 // Import routes
@@ -42,14 +42,14 @@ server.use("/analytics", analyticsRouter);
 server.use(errorMiddleware);
 
 (async () => {
-  try {
-    await dataSource.initialize();
-    logger.info("Connected to db");
-    server.listen(PORT, () => {
-      logger.info(`Server listening to ${PORT}`);
-    });
-  } catch (error) {
-    logger.error(`Failed to connect to db - ${error.message}`);
-    process.exit(0);
-  }
+	try {
+		await dataSource.initialize();
+		logger.info("Connected to db");
+		server.listen(PORT, () => {
+			logger.info(`Server listening to ${PORT}`);
+		});
+	} catch (error) {
+		logger.error(`Failed to connect to db - ${error.message}`);
+		process.exit(0);
+	}
 })();
