@@ -1,6 +1,6 @@
 import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
 import CreateUserPool, {
-    PoolUserRole,
+	PoolUserRole,
 } from "./pages/createUserPool/CreateUserPool";
 
 import AdminDashboard from "./pages/adminDashboard/AdminDashboard";
@@ -19,113 +19,110 @@ import store from "./store/store";
 import UpdateSession from "./pages/session/UpdateSession";
 import CommonDashboard from "./pages/commonDashboard/CommonDashboard";
 
-import CommonDashboard from "./pages/commonDashboard/CommonDashboard";
-
-
 const router = createBrowserRouter([
-    {
-        path: "/",
-        element: <Login />,
-        errorElement: <NotFound />,
-    },
-    {
-        path: "/adminDashboard",
-        element: <AdminDashboard />,
-        errorElement: <NotFound />,
-    },
-    {
-        path: "/dashboard/:userId",
-        element: <Outlet />,
-        children: [
-            {
-                index: true,
-                element: <CommonDashboard />
-            },
-            {
-                path: "training/:trainingId",
-                element: <TrainingDetails />
-            }
-        ],
-        errorElement: <NotFound />
-    },
-    {
-        path: "/training",
-        element: <Outlet />,
-        children: [
-            {
-                index: true,
-                element: <NotFound />,
-            },
-            {
-                path: "create",
-                element: <CreateTraining />,
-            },
-            {
-                path: ":trainingId",
-                element: <TrainingDetails />,
-            },
-            {
-                path: ":trainingId/update",
-                element: <UpdateTraining />,
-            },
-            {
-                path: ":trainingId/session",
-                element: <Outlet />,
-                children: [
-                    {
-                        index: true,
-                        element: <NotFound />,
-                    },
-                    {
-                        path: "create",
-                        element: <CreateSession />,
-                    },
-                    {
-                        path: ":sessionId",
-                        element: <SessionDetails />,
-                    },
-                    {
-                        path: ":sessionId/update",
-                        element: <UpdateSession />,
-                    },
-                ],
-                errorElement: <NotFound />,
-            },
-        ],
-        errorElement: <NotFound />,
-    },
+	{
+		path: "/",
+		element: <Login />,
+		errorElement: <NotFound />,
+	},
+	{
+		path: "/adminDashboard/:userId",
+		element: <AdminDashboard />,
+		errorElement: <NotFound />,
+	},
+	{
+		path: "/dashboard/:userId",
+		element: <Outlet />,
+		children: [
+			{
+				index: true,
+				element: <CommonDashboard />,
+			},
+			{
+				path: "training/:trainingId",
+				element: <TrainingDetails />,
+			},
+		],
+		errorElement: <NotFound />,
+	},
+	{
+		path: "/training",
+		element: <Outlet />,
+		children: [
+			{
+				index: true,
+				element: <NotFound />,
+			},
+			{
+				path: "create",
+				element: <CreateTraining />,
+			},
+			{
+				path: ":trainingId",
+				element: <TrainingDetails />,
+			},
+			{
+				path: ":trainingId/update",
+				element: <UpdateTraining />,
+			},
+			{
+				path: ":trainingId/session",
+				element: <Outlet />,
+				children: [
+					{
+						index: true,
+						element: <NotFound />,
+					},
+					{
+						path: "create",
+						element: <CreateSession />,
+					},
+					{
+						path: ":sessionId",
+						element: <SessionDetails />,
+					},
+					{
+						path: ":sessionId/update",
+						element: <UpdateSession />,
+					},
+				],
+				errorElement: <NotFound />,
+			},
+		],
+		errorElement: <NotFound />,
+	},
 
-    {
-        path: "/createPool",
-        element: <Outlet />,
-        children: [
-            {
-                path: "trainer",
-                element: <CreateUserPool role={PoolUserRole.TRAINER} />,
-            },
-            {
-                path: "moderator",
-                element: <CreateUserPool role={PoolUserRole.MODERATOR} />,
-            },
-            {
-                path: "candidate",
-                element: <CreateUserPool role={PoolUserRole.CANDIDATE} />,
-            },
-        ],
-        errorElement: <NotFound />,
-    },
-    {
-        path: "*",
-        element: <NotFound />,
-    },
+	{
+		path: "/createPool",
+		element: <Outlet />,
+		children: [
+			{
+				path: "trainer",
+				element: <CreateUserPool role={PoolUserRole.TRAINER} />,
+			},
+			{
+				path: "moderator",
+				element: <CreateUserPool role={PoolUserRole.MODERATOR} />,
+			},
+			{
+				path: "candidate",
+				element: <CreateUserPool role={PoolUserRole.CANDIDATE} />,
+			},
+		],
+		errorElement: <NotFound />,
+	},
+	{
+		path: "*",
+		element: <NotFound />,
+	},
 ]);
 
 function App() {
-    return (
-        <Provider store={store}>
-            <RouterProvider router={router} />
-        </Provider>
-    );
+	return (
+		<Provider store={store}>
+			<RouterProvider router={router} />
+		</Provider>
+	);
 }
 
 export default App;
