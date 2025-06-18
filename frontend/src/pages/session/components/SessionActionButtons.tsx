@@ -11,6 +11,9 @@ interface SessionActionButtonsProps {
     uploadAssignment?: boolean;
     giveFeedback?: boolean;
     uploadMaterials?: boolean;
+    viewFeedback?: boolean;
+    viewCandidateFeedback?: boolean,
+    viewTrainerFeedback?: boolean
 }
 
 export const SessionActionButtons: React.FC<SessionActionButtonsProps> = ({
@@ -18,6 +21,9 @@ export const SessionActionButtons: React.FC<SessionActionButtonsProps> = ({
     uploadAssignment = false,
     giveFeedback = false,
     uploadMaterials = false,
+    viewCandidateFeedback = false,
+    viewTrainerFeedback = false
+
 }) => {
     const [uploadModalOpen, setUploadModalOpen] = useState(false);
     const [feedbackModalOpen, setFeedbackModalOpen] = useState(false);
@@ -87,6 +93,27 @@ export const SessionActionButtons: React.FC<SessionActionButtonsProps> = ({
                     />
                 </>
             )}
+            {viewCandidateFeedback && (
+                <>
+                <Button 
+                variant={ButtonType.SECONDARY}
+                onClick={handleGiveFeedback}
+            >
+                View Candidate Feedback
+            </Button>
+                </>
+            )}
+            {viewTrainerFeedback && (
+                <>
+                    <Button 
+                variant={ButtonType.SECONDARY}
+            >
+                View Trainer Feedback
+            </Button>
+                </>
+            )}
+            
+            
         </div>
     );
 };

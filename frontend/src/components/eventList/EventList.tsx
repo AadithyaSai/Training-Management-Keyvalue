@@ -64,8 +64,7 @@ const EventListItem: React.FC<EventItem> = ({ item, heading, isAdmin }) => {
             onClick={() =>
                 heading == "session"
                     ? navigate(`session/${item.id}`)
-                    : isAdmin ? navigate(`/training/${item.id}`)
-                        : navigate(`training/${item.id}`)
+                    : navigate(`/training/${item.id}`)
             }
         >
             <div className="flex items-center justify-between">

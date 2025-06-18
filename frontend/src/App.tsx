@@ -19,7 +19,6 @@ import store from "./store/store";
 import UpdateSession from "./pages/session/UpdateSession";
 import CommonDashboard from "./pages/commonDashboard/CommonDashboard";
 
-import CommonDashboard from "./pages/commonDashboard/CommonDashboard";
 
 
 const router = createBrowserRouter([
@@ -43,7 +42,18 @@ const router = createBrowserRouter([
             },
             {
                 path: "training/:trainingId",
-                element: <TrainingDetails />
+                element: <Outlet />,
+                children: [
+                    {
+                        index: true,
+                        element: <TrainingDetails/>
+                    },
+
+                    {
+                        path: "session/:sessionId",
+                        element: <SessionDetails/>
+                    }
+                ]
             }
         ],
         errorElement: <NotFound />

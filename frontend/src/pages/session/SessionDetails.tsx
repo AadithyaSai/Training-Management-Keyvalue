@@ -7,59 +7,80 @@ import Layout from "../../components/layout/Layout";
 import { useNavigate, useParams } from "react-router-dom";
 import { useDeleteSessionMutation, useGetSessionByIdQuery } from "../../api-service/session/session.api";
 import Button, { ButtonType } from "../../components/button/Button";
+import { jwtDecode } from "jwt-decode";
 
 const SessionDetails = () => {
-     const [sessionDetails, setSessionDetails] = useState<SessionData>({
+    const [sessionDetails, setSessionDetails] = useState<SessionData>({
         description: "",
         userRoles: []
     });
 
+    const token = localStorage.getItem("token")
+    const decoded = jwtDecode(token || "");
+    const user_id = decoded.id;
+    console.log(user_id)
 
-    
+
+
     const navigate = useNavigate();
     const { trainingId, sessionId } = useParams();
     const { data: sessionDetailsData } = useGetSessionByIdQuery({ id: sessionId });
     const [deleteSession, { isLoading }] = useDeleteSessionMutation();
 
     useEffect(() => {
-        if(!sessionDetailsData)
-            return;
+        if (!sessionDetailsData)
+            return 
         setSessionDetails({
             description: sessionDetailsData.description,
             userRoles: []
         })
     }, [sessionDetailsData])
 
-    const userRole: UserRole = UserRoleType.CANDIDATE;   
+    const getUserRoleFromSession = (): UserRole | null => {
+        const matchedUser = sessionDetailsData?.userSessions.find(
+            (userSession: any) => userSession.user.id === user_id
+        );
+        console.log("YOOO",matchedUser.role)
+        return matchedUser ? (matchedUser.role as UserRole) : null;
+    };
+
+
+    const userRole = getUserRoleFromSession();
 
     const checkRole = (roleType: UserRole) => {
-        return userRole == roleType;
+        return userRole === roleType;
+    };
+
+    if (userRole === null) {
+        return <div>User role not found for this session.</div>;
     }
 
 
 
-    if(!sessionDetailsData)
+
+
+    if (!sessionDetailsData)
         return (<></>);
 
     return (
-        <Layout title={sessionDetailsData.title} isLoading={isLoading} endAdornments={
+        <Layout title={sessionDetailsData.title} isLoading={isLoading} endAdornments={ decoded.isAdmin &&
             <div className="flex gap-3">
-                    <Button
-                        variant={ButtonType.SECONDARY}
-                        onClick={() => navigate("update")}
-                    >
-                        Update
-                    </Button>
-                    <Button
-                        variant={ButtonType.SECONDARY}
-                        onClick={() => {
-                            deleteSession({ id: sessionId });
-                            navigate(`/training/${trainingId}`);
-                        }}
-                    >
-                        Delete
-                    </Button>
-                </div>
+                <Button
+                    variant={ButtonType.SECONDARY}
+                    onClick={() => navigate("update")}
+                >
+                    Update
+                </Button>
+                <Button
+                    variant={ButtonType.SECONDARY}
+                    onClick={() => {
+                        deleteSession({ id: sessionId });
+                        navigate(`/training/${trainingId}`);
+                    }}
+                >
+                    Delete
+                </Button>
+            </div>
         }>
             <div className="min-h-screen w-full relative text-white">
                 <div>
@@ -73,6 +94,8 @@ const SessionDetails = () => {
                                 uploadMaterials={checkRole(UserRoleType.TRAINER)}
                                 giveFeedback={true}
                                 uploadAssignment={checkRole(UserRoleType.CANDIDATE)}
+                                viewCandidateFeedback = {decoded.isAdmin}
+                                viewTrainerFeedback = {decoded.isAdmin}
                             />
                         </div>
                     </div>
