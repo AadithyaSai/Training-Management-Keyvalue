@@ -24,34 +24,34 @@ const assignmentService = new AssignmentService(
 const assignmentController = new AssignmentController(assignmentService);
 const assignmentRouter = Router();
 
-// assignmentRouter.post(
-//   "/session/:sessionId",
-//   assignmentController.createAssignment.bind(assignmentController)
-// );
-// assignmentRouter.get(
-//   "/:id",
-//   assignmentController.getAssignmentById.bind(assignmentController)
-// );
-// assignmentRouter.get(
-//   "/",
-//   assignmentController.getAllAssignments.bind(assignmentController)
-// );
-// assignmentRouter.patch(
-//   "/:id",
-//   assignmentController.updateAssignment.bind(assignmentController)
-// );
-// assignmentRouter.delete(
-//   "/:id",
-//   assignmentController.deleteAssignment.bind(assignmentController)
-// );
-// assignmentRouter.post(
-//   "/:id/submit",
-//   assignmentController.submitAssignment.bind(assignmentController)
-// );
-// assignmentRouter.get(
-//   "/:id/submissions",
-//   assignmentController.getAssignmentSubmissions.bind(assignmentController)
-// );
+assignmentRouter.post(
+  "/session/:sessionId",
+  assignmentController.createAssignment.bind(assignmentController)
+);
+assignmentRouter.get(
+  "/:id",
+  assignmentController.getAssignmentById.bind(assignmentController)
+);
+assignmentRouter.get(
+  "/",
+  assignmentController.getAllAssignments.bind(assignmentController)
+);
+assignmentRouter.patch(
+  "/:id",
+  assignmentController.updateAssignment.bind(assignmentController)
+);
+assignmentRouter.delete(
+  "/:id",
+  assignmentController.deleteAssignment.bind(assignmentController)
+);
+assignmentRouter.post(
+  "/:id/submit",
+  assignmentController.submitAssignment.bind(assignmentController)
+);
+assignmentRouter.get(
+  "/:id/submissions",
+  assignmentController.getAssignmentSubmissions.bind(assignmentController)
+);
 
 export default assignmentRouter;
 export {
