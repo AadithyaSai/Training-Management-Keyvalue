@@ -60,9 +60,7 @@ export default function validRoles(allowedRoles: AuthRole[]) {
       }
 
       const sessionId = parseInt(req.params.sessionId, 10) || null; // will only be present in some session endpoints. null otherwise
-      const reqUserId =
-        parseInt(req.params.id, 10) || (req.body && req.body.id) || null; // will only be present in some user endpoints. null otherwise
-      if (!(await checkAccess(allowedRoles, id, sessionId, reqUserId))) {
+      if (!(await checkAccess(allowedRoles, id, sessionId))) {
         throw new HTTPException(403, "Forbidden");
       }
 
