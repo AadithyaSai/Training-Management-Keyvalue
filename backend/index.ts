@@ -11,6 +11,7 @@ import sessionRouter from "./routes/session.routes";
 import materialRouter from "./routes/material.route";
 import trainingRouter from "./routes/training.route";
 import feedbackRouter from "./routes/feedback.routes";
+import assignmentRouter from "./routes/assignment.routes";
 import analyticsRouter from "./routes/analytics.routes";
 
 const PORT = 3000;
@@ -29,15 +30,15 @@ server.get("/health", (req, res) => {
 
 // Import routes
 server.use("/auth", authRouter);
-
-server.use(authMiddleware); // Apply auth middleware to all routes below this point
-
+server.use(authMiddleware);
 server.use("/users", userRouter);
 server.use("/session", sessionRouter);
 server.use("/material", materialRouter);
 server.use("/trainings", trainingRouter);
-server.use("/feedback", feedbackRouter);
-
+server.use("/session", sessionRouter);
+server.use("/session/:sessionId/material", materialRouter);
+server.use("/session/:sessionId/feedback", feedbackRouter);
+server.use("/session/:sessionId/assignments", assignmentRouter);
 server.use("/analytics", analyticsRouter);
 server.use(errorMiddleware);
 

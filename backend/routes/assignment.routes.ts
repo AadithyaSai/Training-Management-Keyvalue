@@ -7,6 +7,8 @@ import AssignmentController from "../controllers/assignment.controller";
 import AssignmentSubmissionRepository from "../repositories/assignmentSubmission.repository";
 import { userService } from "./user.route";
 import { sessionService } from "./session.routes";
+import validRoles from "../middlewares/authorization.middleware";
+import { AuthRoles } from "../types/authorization.type";
 
 const assignmentRepository = new AssignmentRepository(
   dataSource.getRepository("Assignment")
@@ -22,36 +24,53 @@ const assignmentService = new AssignmentService(
   sessionService
 );
 const assignmentController = new AssignmentController(assignmentService);
-const assignmentRouter = Router();
+const assignmentRouter = Router({ mergeParams: true });
 
-// assignmentRouter.post(
-//   "/session/:sessionId",
-//   assignmentController.createAssignment.bind(assignmentController)
-// );
-// assignmentRouter.get(
-//   "/:id",
-//   assignmentController.getAssignmentById.bind(assignmentController)
-// );
-// assignmentRouter.get(
-//   "/",
-//   assignmentController.getAllAssignments.bind(assignmentController)
-// );
-// assignmentRouter.patch(
-//   "/:id",
-//   assignmentController.updateAssignment.bind(assignmentController)
-// );
-// assignmentRouter.delete(
-//   "/:id",
-//   assignmentController.deleteAssignment.bind(assignmentController)
-// );
-// assignmentRouter.post(
-//   "/:id/submit",
-//   assignmentController.submitAssignment.bind(assignmentController)
-// );
-// assignmentRouter.get(
-//   "/:id/submissions",
-//   assignmentController.getAssignmentSubmissions.bind(assignmentController)
-// );
+assignmentRouter.post(
+  "/session/:sessionId",
+  validRoles([AuthRoles.TRAINING_ADMIN, AuthRoles.TRAINER]),
+  assignmentController.createAssignment.bind(assignmentController)
+);
+assignmentRouter.get(
+  "/:id",
+  validRoles([
+    AuthRoles.TRAINING_ADMIN,
+    AuthRoles.TRAINER,
+    AuthRoles.MODERATOR,
+    AuthRoles.CANDIDATE,
+  ]),
+  assignmentController.getAssignmentById.bind(assignmentController)
+);
+assignmentRouter.get(
+  "/",
+  validRoles([AuthRoles.ADMIN]),
+  assignmentController.getAllAssignments.bind(assignmentController)
+);
+assignmentRouter.patch(
+  "/:id",
+  validRoles([AuthRoles.ADMIN, AuthRoles.TRAINER]),
+  assignmentController.updateAssignment.bind(assignmentController)
+);
+assignmentRouter.delete(
+  "/:id",
+  validRoles([AuthRoles.ADMIN, AuthRoles.TRAINER]),
+  assignmentController.deleteAssignment.bind(assignmentController)
+);
+assignmentRouter.post(
+  "/:id/submit",
+  validRoles([AuthRoles.CANDIDATE]),
+  assignmentController.submitAssignment.bind(assignmentController)
+);
+assignmentRouter.get(
+  "/:id/submissions",
+  validRoles([
+    AuthRoles.TRAINING_ADMIN,
+    AuthRoles.MODERATOR,
+    AuthRoles.TRAINER,
+    AuthRoles.CANDIDATE,
+  ]),
+  assignmentController.getAssignmentSubmissions.bind(assignmentController)
+);
 
 export default assignmentRouter;
 export {
