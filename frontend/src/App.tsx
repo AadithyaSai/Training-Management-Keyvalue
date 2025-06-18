@@ -4,17 +4,18 @@ import CreateUserPool, {
 } from "./pages/createUserPool/CreateUserPool";
 
 import AdminDashboard from "./pages/adminDashboard/AdminDashboard";
-import CreateProgram from "./pages/training/CreateTraining";
-import EditProgram from "./pages/training/EditTraining";
+import CreateTraining from "./pages/training/CreateTraining";
+import UpdateTraining from "./pages/training/UpdateTraining";
 import Login from "./pages/login/Login";
 import TrainingDetails from "./pages/training/TrainingDetails";
 import NotFound from "./components/error/notFound/NoutFound";
 
-import CreateSession from "./components/createSession/CreateSession";
+import CreateSession from "./pages/session/CreateSession";
 
-import SessionDetails from "./pages/sessionDetails/SessionDetails";
+import SessionDetails from "./pages/session/SessionDetails";
 import { Provider } from "react-redux";
 import store from "./store/store";
+import UpdateSession from "./pages/session/UpdateSession";
 
 const router = createBrowserRouter([
     {
@@ -28,47 +29,52 @@ const router = createBrowserRouter([
         errorElement: <NotFound />,
     },
     {
-        path: "/program",
+        path: "/training",
         element: <Outlet />,
         children: [
             {
                 index: true,
                 element: <NotFound />,
+            },
+            {
+                path: "create",
+                element: <CreateTraining />,
             },
             {
                 path: ":trainingId",
                 element: <TrainingDetails />,
             },
             {
-                path: "create",
-                element: <CreateProgram />,
+                path: ":trainingId/update",
+                element: <UpdateTraining />,
             },
             {
-                path: "edit",
-                element: <EditProgram />,
+                path: ":trainingId/session",
+                element: <Outlet />,
+                children: [
+                    {
+                        index: true,
+                        element: <NotFound />,
+                    },
+                    {
+                        path: "create",
+                        element: <CreateSession />,
+                    },
+                    {
+                        path: ":sessionId",
+                        element: <SessionDetails />,
+                    },
+                    {
+                        path: ":sessionId/update",
+                        element: <UpdateSession />,
+                    },
+                ],
+                errorElement: <NotFound />,
             },
         ],
         errorElement: <NotFound />,
     },
-    {
-        path: "/session",
-        element: <Outlet />,
-        children: [
-            {
-                index: true,
-                element: <NotFound />,
-            },
-            {
-                path: ":sessionId",
-                element: <SessionDetails />,
-            },
-            {
-                path: "create",
-                element: <CreateSession />,
-            },
-        ],
-        errorElement: <NotFound />,
-    },
+
     {
         path: "/createPool",
         element: <Outlet />,
@@ -90,8 +96,8 @@ const router = createBrowserRouter([
     },
     {
         path: "*",
-        element: <NotFound />
-    }
+        element: <NotFound />,
+    },
 ]);
 
 function App() {

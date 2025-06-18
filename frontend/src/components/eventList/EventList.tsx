@@ -16,9 +16,10 @@ export type EventProps = {
     id: number;
     title: string;
     description: string;
-    startDate: string;
-    endDate: string;
-    duration?: string;
+    date?: string;
+    startDate?: string;
+    endDate?: string;
+    duration?: number;
     status?: (typeof EventStatusType)[keyof typeof EventStatusType];
     trainer?: string;
     totalSessions?: number;
@@ -45,8 +46,7 @@ export const formatTrainingList = (trainingDetailsList: Array<EventProps>) => {
                 id: trainingDetails.id,
                 title: trainingDetails.title,
                 description: trainingDetails.description,
-                startDate: trainingDetails.startDate,
-                endDate: trainingDetails.endDate,
+                date: trainingDetails.date,
                 status: trainingDetails?.status,
             };
         }
@@ -59,7 +59,11 @@ const EventListItem: React.FC<EventItem> = ({ item, heading }) => {
     return (
         <div
             className="border border-gray-700 p-4 rounded-lg bg-cardColor cursor-pointer"
-            onClick={() => navigate(`/${heading}/${item.id}`)}
+            onClick={() =>
+                heading == "session"
+                    ? navigate(`session/${item.id}`)
+                    : navigate(`/training/${item.id}`)
+            }
         >
             <div className="flex items-center justify-between">
                 <h3 className="text-xl font-semibold">{item.title}</h3>
@@ -74,7 +78,7 @@ const EventListItem: React.FC<EventItem> = ({ item, heading }) => {
                 <p className="text-sm mt-1 text-gray-400">{item.description}</p>
                 {heading == "session" ? (
                     <p className="text-sm mt-1">
-                        Date : {dayjs(item.startDate).format("DD/MM/YYYY")}
+                        Date : {dayjs(item.date).format("DD/MM/YYYY")}
                     </p>
                 ) : (
                     <>
@@ -126,7 +130,7 @@ const EventList: React.FC<EventListProps> = ({
     const filteredData = (data || []).filter(
         (item) =>
             item.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
-            (heading == "Programs" ||
+            (heading != "Sessions" ||
                 statusFilter.toLowerCase() == "all" ||
                 item.status === statusFilter)
     );
@@ -202,7 +206,7 @@ const EventList: React.FC<EventListProps> = ({
                 <div className="space-y-4 w-full px-2">
                     {filteredData.length === 0 ? (
                         <p className="text-center text-gray-500 w-full border-2 border-borderColor py-10">
-                            No programs found
+                            No trainings found
                         </p>
                     ) : (
                         filteredData.map((item, index) => (

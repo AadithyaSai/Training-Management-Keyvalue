@@ -1,13 +1,16 @@
+import { useNavigate, useParams } from "react-router-dom";
+import FormInput from "../../components/formInput/FormInput";
 import ActionButton from "../../components/actionButton/ActionButton";
 import Button, { ButtonType } from "../../components/button/Button";
 import Layout from "../../components/layout/Layout";
-import FormInput from "../../components/formInput/FormInput";
-import { useState, type FormEvent } from "react";
+import {
+    useUpdateTrainingMutation,
+    useGetTrainingByIdQuery,
+} from "../../api-service/training/training.api";
+import { useEffect, useState, type FormEvent } from "react";
 import type { TrainingDetailsPayload } from "../../api-service/training/training.types";
-import { useNavigate } from "react-router-dom";
-import { useCreateTrainingMutation } from "../../api-service/training/training.api";
 
-const CreateTraining = () => {
+const UpdateTraining = () => {
     const [trainingDetails, setTrainingDetails] =
         useState<TrainingDetailsPayload>({
             title: "",
@@ -16,24 +19,37 @@ const CreateTraining = () => {
             endDate: "",
         });
 
+    const { trainingId } = useParams();
     const navigate = useNavigate();
-    const [createTraining] = useCreateTrainingMutation();
+    const [updateTraining] = useUpdateTrainingMutation();
+    const { data: trainingDetailsData } = useGetTrainingByIdQuery({
+        id: trainingId,
+    });
 
     const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-
-        createTraining(trainingDetails)
+        updateTraining({ id: trainingId, data: trainingDetails })
             .unwrap()
             .then(() => {
-                navigate("/dashboard");
+                navigate(`/training/${trainingId}`);
             })
             .catch((error) => {
                 console.log(error);
             });
     };
 
+    useEffect(() => {
+        if (!trainingDetailsData) return;
+        setTrainingDetails({
+            title: trainingDetailsData.title,
+            description: trainingDetailsData.description,
+            startDate: trainingDetailsData.startDate,
+            endDate: trainingDetailsData.endDate,
+        });
+    }, [trainingDetailsData]);
+
     return (
-        <Layout title="Create Training">
+        <Layout title="Update Training">
             <form
                 onSubmit={handleSubmit}
                 className="flex flex-col w-full gap-6 mb-6 bg-cardColor border border-borderColor p-4 rounded"
@@ -85,6 +101,7 @@ const CreateTraining = () => {
                         })
                     }
                 />
+
                 <div className="flex flex-col gap-3">
                     <ActionButton
                         label="Add Trainer to Pool"
@@ -119,4 +136,4 @@ const CreateTraining = () => {
     );
 };
 
-export default CreateTraining;
+export default UpdateTraining;

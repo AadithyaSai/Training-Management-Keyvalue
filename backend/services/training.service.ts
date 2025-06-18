@@ -10,20 +10,24 @@ export default class TrainingService {
   }
 
   async getTrainingById(id: number) {
-    
     return this.trainingRepository.findOneById(id);
   }
+
 
   async createTraining(
     trainingDto: Partial<Training> & {
       members?: { userId: number; role: string }[];
-    }
+    },
+    creatorId: number
   ) {
-    const { members, ...trainingData } = trainingDto;
+    const { members = [], ...trainingData } = trainingDto;
+
     const training = await this.trainingRepository.saveTraining(trainingData);
-    if (members && members.length > 0) {
-      await this.trainingRepository.addMembers(training.id, members);
-    }
+
+    members.push({ userId: creatorId, role: "admin" });
+
+    await this.trainingRepository.addMembers(training.id, members);
+
     return training;
   }
 
@@ -39,12 +43,14 @@ export default class TrainingService {
     return this.trainingRepository.addMembers(trainingId, members);
   }
 
- 
   removeMembers(
   trainingId: number,
   members: { userId: number; role: string }[]
 ) {
   return this.trainingRepository.removeMembers(trainingId, members);
+}
+async getProgramsByUserId(userId: number) {
+  return this.trainingRepository.findProgramsByUserId(userId);
 }
 
 }

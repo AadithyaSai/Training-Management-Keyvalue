@@ -1,10 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { useGetTrainingListQuery } from "../../api-service/training/training.api";
-import type { EventProps } from "../../components/eventList/EventList";
 import DashboardCardList from "../../components/dashboardCardList/DashboardCardList";
 import EventList, { formatTrainingList } from "../../components/eventList/EventList";
 import Layout from "../../components/layout/Layout";
-
 
 const AdminDashboard = () => {
     const navigate = useNavigate();
@@ -23,9 +21,9 @@ const AdminDashboard = () => {
                     ]}
                 />
                 <EventList
-                    heading="Programs"
+                    heading="Trainings"
                     showCreateButton={true}
-                    onCreateClick={() => navigate("/program/create")}
+                    onCreateClick={() => navigate("/training/create")}
                     data={formatTrainingList(trainingDetailsList)}
                 />
             </div>
