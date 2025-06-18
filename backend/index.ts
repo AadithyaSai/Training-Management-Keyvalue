@@ -6,7 +6,7 @@ import LoggerService from "./services/logger.service";
 import userRouter from "./routes/user.route";
 import authRouter from "./routes/auth.routes";
 import errorMiddleware from "./middlewares/errorMiddleware";
-import authMiddleware from "./middlewares/auth.middleware"
+import authMiddleware from "./middlewares/auth.middleware";
 import sessionRouter from "./routes/session.routes";
 import materialRouter from "./routes/material.route";
 import trainingRouter from "./routes/training.route";
@@ -28,12 +28,10 @@ server.get("/health", (req, res) => {
 
 // Import routes
 server.use("/auth", authRouter);
-
-// server.use(authMiddleware); // Apply auth middleware to all routes below this point
-
+server.use(authMiddleware);
+server.use("/session", sessionRouter);
 server.use("/users", userRouter);
-server.use("/session",sessionRouter)
-server.use("/material",materialRouter)
+server.use("/material", materialRouter);
 server.use("/trainings", trainingRouter);
 server.use("/feedback", feedbackRouter);
 
