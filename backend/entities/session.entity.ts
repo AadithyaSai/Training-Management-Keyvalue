@@ -1,5 +1,11 @@
-
-import { Column, Entity,JoinColumn,ManyToOne, OneToMany, Timestamp } from "typeorm";
+import {
+	Column,
+	Entity,
+	JoinColumn,
+	ManyToOne,
+	OneToMany,
+	Timestamp,
+} from "typeorm";
 import AbstractBaseEntity from "./abstract.entity";
 
 import { Assignment } from "./assignment.entity";
@@ -9,56 +15,55 @@ import { Material } from "./material.entity";
 import { Training } from "./training.entity";
 
 export enum Status {
-  Draft = "Draft",
-  Scheduled = "Scheduled",
-  InProgress = "InProgress",
-  Completed = "Completed",
+	Draft = "Draft",
+	Scheduled = "Scheduled",
+	InProgress = "InProgress",
+	Completed = "Completed",
 }
-
 
 @Entity()
 export class Session extends AbstractBaseEntity {
-  @Column()
-  title: string;
+	@Column()
+	title: string;
 
-  @ManyToOne(() => Training, (training) => training.sessions)
-  training: Training;
+	@ManyToOne(() => Training, (training) => training.sessions)
+	training: Training;
 
-  @Column()
-  description: string;
+	@Column()
+	description: string;
 
-  @Column({ default: "Draft" as Status })
-  status: Status;
+	@Column({ default: "Draft" as Status })
+	status: Status;
 
-  @Column({nullable:true})
-  preReq: string;
+	@Column({ nullable: true })
+	preReq: string;
 
-  @Column({ type: "timestamp" })
-  startTime: Date;
+	@Column({ type: "timestamp", nullable: true })
+	date?: Date;
 
-  @Column({ type: "timestamp" })
-  endTime: Date;
+	@Column({ nullable: true })
+	slot?: number;
 
-  @Column({ type: 'text' ,nullable:true})
-  materialQualityFeedback?: string;
+	@Column({ nullable: true })
+	duration?: number;
 
-  @Column({ type: 'text' ,nullable:true})
-  sessionFeedback?: string;
+	@Column({ type: "text", nullable: true })
+	materialQualityFeedback?: string;
 
-  @OneToMany(() => Assignment, (assignments) => assignments.session, {
+	@Column({ type: "text", nullable: true })
+	sessionFeedback?: string;
+
+	@OneToMany(() => Assignment, (assignments) => assignments.session, {})
+	assignments?: Assignment[];
+
+	@OneToMany(() => Feedback, (feedbacks) => feedbacks.session, {})
+	feedbacks?: Feedback[];
+
+	@OneToMany(() => UserSession, (userSession) => userSession.session)
+	userSessions?: UserSession[];
+
+	@OneToMany(() => Material, (material) => material.session, {
+		cascade: true,
 	})
-  assignments?: Assignment[];
-
-  @OneToMany(() => Feedback, (feedbacks) => feedbacks.session, {
-	})
-  feedbacks?: Feedback[];
-
-  @OneToMany(() => UserSession, (userSession) => userSession.session)
-  userSessions?: UserSession[];
-
-  @OneToMany(() => Material, (material) => material.session, {
-    cascade: true,
-  })
-  materials?: Material[];
-  
+	materials?: Material[];
 }

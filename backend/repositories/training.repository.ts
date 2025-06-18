@@ -81,4 +81,14 @@ export default class TrainingRepository {
 
     return { message: "Members removed" };
   }
+  async findProgramsByUserId(userId: number) {
+    return this.trainingRepo.find({
+      relations: ["members", "members.user", "sessions"],
+      where: {
+        members: {
+          user: { id: userId },
+        },
+      },
+    });
+  }
 }

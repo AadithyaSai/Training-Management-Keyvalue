@@ -1,71 +1,69 @@
 import {
-  IsNotEmpty,
-  IsString,
-  IsDateString,
-  IsOptional,
-  IsEnum,
-  IsNumber,
+	IsNotEmpty,
+	IsString,
+	IsDateString,
+	IsOptional,
+	IsEnum,
+	IsNumber,
 } from "class-validator";
 import { Status } from "../entities/session.entity";
 
 export class CreateSessionDto {
-  @IsNotEmpty()
-  @IsString()
-  title: string;
+	@IsNotEmpty()
+	@IsString()
+	title: string;
 
-  @IsNotEmpty()
-  @IsNumber()
-  program_id:number
+	@IsNotEmpty()
+	@IsNumber()
+	programId: number;
 
-  @IsOptional()
-  @IsString()
-  description?: string;
+	@IsOptional()
+	@IsString()
+	description?: string;
 
-  @IsOptional()
-  @IsString()
-  preReq?: string;
+	@IsOptional()
+	@IsString()
+	preReq?: string;
 
-  @IsEnum(Status)
-  status:Status
+	@IsOptional()
+	@IsEnum(Status)
+	status: Status;
 
-  @IsNotEmpty()
-  @IsDateString()
-  startTime:Date;
-
-  @IsNotEmpty()
-  @IsDateString()
-  endTime:Date;
+	@IsNotEmpty()
+	@IsNumber()
+	duration?: number;
 }
 
-export class UpdateSessionDto{
-  @IsOptional()
-  @IsString()
-  title?: string;
+export class UpdateSessionDto {
+	@IsOptional()
+	@IsString()
+	title?: string;
 
-  @IsOptional()
-  @IsNumber()
-  program_id?:number
+	@IsOptional()
+	@IsNumber()
+	program_id?: number;
 
+	@IsOptional()
+	@IsString()
+	description?: string;
 
-  @IsOptional()
-  @IsString()
-  description?: string;
+	@IsOptional()
+	@IsString()
+	preReq?: string;
 
-  @IsOptional()
-  @IsString()
-  preReq?: string;
+	@IsOptional()
+	@IsEnum(Status)
+	status?: Status;
 
+	@IsOptional()
+	@IsDateString()
+	date?: Date;
 
-  @IsOptional()
-  @IsEnum(Status)
-  status?:Status
+	@IsOptional()
+	@IsNumber()
+	slot?: number;
 
-  @IsOptional()
-  @IsDateString()
-  startTime?:Date;
-
-  @IsOptional()
-  @IsDateString()
-  endTime?:Date;
-
+	@IsOptional()
+	@IsNumber()
+	duration?: number;
 }

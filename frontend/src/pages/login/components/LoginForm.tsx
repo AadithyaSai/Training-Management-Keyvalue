@@ -1,14 +1,16 @@
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import LoginInput from "./LoginInput";
 import { useNavigate } from "react-router-dom";
 import { useLoginMutation } from "../../../api-service/auth/login.api";
+import Button, { ButtonType } from "../../../components/button/Button";
+import { toast } from "react-toastify";
 
 type SliderPosition = "left" | "right";
 
 type LoginFormSectionProps = {
     type?: string;
     children?: React.ReactNode;
-    onClick?: () => void;
+    onSubmit?: (event: FormEvent<HTMLFormElement>) => void;
 };
 
 const KVLogo = () => {
@@ -22,11 +24,11 @@ const KVLogo = () => {
 const LoginFormSection: React.FC<LoginFormSectionProps> = ({
     type = "signin",
     children,
-    onClick,
+    onSubmit,
 }) => {
     return (
         <form
-            onSubmit={() => {}}
+            onSubmit={onSubmit}
             className="w-[50%] h-full flex flex-col items-center justify-center gap-8 px-2 text-white"
         >
             <h2 className="text-[40px] font-bold">
@@ -40,13 +42,13 @@ const LoginFormSection: React.FC<LoginFormSectionProps> = ({
                     Forget Password?
                 </p>
             )}
-            <button
-                type="button"
-                onClick={onClick}
+            <Button
+                variant={ButtonType.PLAIN}
+                type="submit"
                 className="border border-borderColor bg-white hover:bg-gray-300 hover:scale-105 transition-all duration-300 text-black px-10 py-2 rounded-md uppercase text-md"
             >
                 {type?.toUpperCase()}
-            </button>
+            </Button>
         </form>
     );
 };
@@ -91,11 +93,12 @@ const LoginForm = () => {
         password: "",
     });
 
-    const [login, { isLoading }] = useLoginMutation();
+    const [login] = useLoginMutation();
 
     const navigate = useNavigate();
 
-    const handleLogin = () => {
+    const handleLogin = (event: FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
         login({ username: signinData.username, password: signinData.password })
             .unwrap()
             .then((data) => {
@@ -104,9 +107,8 @@ const LoginForm = () => {
                 navigate("/dashboard");
             })
             .catch((error) => {
-                console.log(error);
                 setSigninData({ username: "", password: "" });
-                navigate("/");
+                toast(`Error: ${error.data.error || "Something went wrong"}`);
             });
     };
 
@@ -152,7 +154,7 @@ const LoginForm = () => {
                 />
             </LoginFormSection>
 
-            <LoginFormSection type="signin" onClick={handleLogin}>
+            <LoginFormSection type="signin" onSubmit={handleLogin}>
                 <LoginInput
                     name="username"
                     id="username"
