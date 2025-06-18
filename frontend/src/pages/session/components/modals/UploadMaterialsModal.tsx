@@ -1,4 +1,8 @@
-import React, { useState, type DragEvent, type ChangeEvent } from "react";
+import React, { useState, type DragEvent, type ChangeEvent, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import { useGetSessionByIdQuery } from "../../../../api-service/session/session.api";
+import { useCreateMaterialMutation } from "../../../../api-service/uploadMaterial/uploadMaterial.api";
+import type { MaterialPayload } from "../../../../api-service/uploadMaterial/uploadMaterial.types";
 
 interface UploadMaterialsModalProps {
   isOpen: boolean;
@@ -9,10 +13,20 @@ export const UploadMaterialsModal: React.FC<UploadMaterialsModalProps> = ({
   isOpen,
   onClose,
 }) => {
+  const [sessionDetails, setSessionDetails] = useState({ title: "" });
   const [files, setFiles] = useState<File[]>([]);
   const [dragActive, setDragActive] = useState(false);
+  const { sessionId } = useParams();
+  const { data: sessionDetailsData } = useGetSessionByIdQuery({ id: sessionId });
+  const [uploadMaterial] = useCreateMaterialMutation();
 
-  if (!isOpen) return null;
+  useEffect(() => {
+    if (sessionDetailsData) {
+      setSessionDetails({
+        title: sessionDetailsData.title
+      });
+    }
+  }, [sessionDetailsData]);
 
   const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -39,10 +53,26 @@ export const UploadMaterialsModal: React.FC<UploadMaterialsModalProps> = ({
     }
   };
 
-  const handleUpload = () => {
-    console.log("Uploading files:", files);
+  const handleUpload = async () => {
+    if (!sessionId) return;
+
+    // In your real implementation, you'll likely upload one by one or send as FormData.
+    const payload: MaterialPayload = {
+      session_id: Number(sessionId),
+      link: files[0].name, // Update this to actual uploaded link in real-world case
+    };
+
+    try {
+      await uploadMaterial(payload).unwrap();
+      console.log("Uploaded:", payload);
+    } catch (error) {
+      console.error("Upload error:", error);
+    }
+
     onClose();
   };
+
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 font-sans">
@@ -52,12 +82,11 @@ export const UploadMaterialsModal: React.FC<UploadMaterialsModalProps> = ({
           <button onClick={onClose} className="text-2xl hover:text-red-500">&times;</button>
         </div>
         <div className="mt-5">
-          <label className="text-sm mb-2 block">Session Name</label>
+          <label className="text-sm mb-2 block">{sessionDetails.title}</label>
         </div>
         <div
-          className={`mt-2 border-2 ${
-            dragActive ? "border-white" : "border-gray-600"
-          } border-dashed rounded-md h-36 flex flex-col justify-center items-center text-gray-300 text-sm transition-colors cursor-pointer`}
+          className={`mt-2 border-2 ${dragActive ? "border-white" : "border-gray-600"
+            } border-dashed rounded-md h-36 flex flex-col justify-center items-center text-gray-300 text-sm transition-colors cursor-pointer`}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}

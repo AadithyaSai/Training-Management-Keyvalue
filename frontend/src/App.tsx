@@ -34,28 +34,7 @@ const router = createBrowserRouter([
     },
     {
         path: "/dashboard/:userId",
-        element: <Outlet />,
-        children: [
-            {
-                index: true,
-                element: <CommonDashboard />
-            },
-            {
-                path: "training/:trainingId",
-                element: <Outlet />,
-                children: [
-                    {
-                        index: true,
-                        element: <TrainingDetails/>
-                    },
-
-                    {
-                        path: "session/:sessionId",
-                        element: <SessionDetails/>
-                    }
-                ]
-            }
-        ],
+        element: <CommonDashboard />,
         errorElement: <NotFound />
     },
     {

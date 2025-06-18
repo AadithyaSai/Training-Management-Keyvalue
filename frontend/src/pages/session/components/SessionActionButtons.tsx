@@ -43,6 +43,7 @@ export const SessionActionButtons: React.FC<SessionActionButtonsProps> = ({
 
     const handleUploadMaterials = () => {
         setUploadModalOpen(true);
+        
     };
 
     return (

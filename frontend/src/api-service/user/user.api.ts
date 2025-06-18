@@ -15,6 +15,13 @@ export const userApi = baseApi.injectEndpoints({
                 method: "GET",
             }),
         }),
+        getTrainingById: builder.query({
+                    query: (id) => ({
+                        url: `/trainings/${id}`,
+                        method: "GET"
+                    }),
+                    
+                }),
     }),
 });
 

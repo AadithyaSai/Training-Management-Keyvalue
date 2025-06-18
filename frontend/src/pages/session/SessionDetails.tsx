@@ -10,14 +10,15 @@ import Button, { ButtonType } from "../../components/button/Button";
 import { jwtDecode } from "jwt-decode";
 
 const SessionDetails = () => {
+
     const [sessionDetails, setSessionDetails] = useState<SessionData>({
         description: "",
         userRoles: []
     });
 
     const token = localStorage.getItem("token")
-    const decoded = jwtDecode(token || "");
-    const user_id = decoded.id;
+    const decoded: { id: number, isAdmin: boolean } = jwtDecode(token || "");
+    const { id: user_id, isAdmin } = decoded;
     console.log(user_id)
 
 
@@ -29,7 +30,7 @@ const SessionDetails = () => {
 
     useEffect(() => {
         if (!sessionDetailsData)
-            return 
+            return
         setSessionDetails({
             description: sessionDetailsData.description,
             userRoles: []
@@ -40,7 +41,6 @@ const SessionDetails = () => {
         const matchedUser = sessionDetailsData?.userSessions.find(
             (userSession: any) => userSession.user.id === user_id
         );
-        console.log("YOOO",matchedUser.role)
         return matchedUser ? (matchedUser.role as UserRole) : null;
     };
 
@@ -63,8 +63,8 @@ const SessionDetails = () => {
         return (<></>);
 
     return (
-        <Layout title={sessionDetailsData.title} isLoading={isLoading} endAdornments={ decoded.isAdmin &&
-            <div className="flex gap-3">
+        <Layout title={sessionDetailsData.title} isLoading={isLoading} endAdornments={isAdmin &&
+            (<div className="flex gap-3">
                 <Button
                     variant={ButtonType.SECONDARY}
                     onClick={() => navigate("update")}
@@ -80,7 +80,7 @@ const SessionDetails = () => {
                 >
                     Delete
                 </Button>
-            </div>
+            </div>)
         }>
             <div className="min-h-screen w-full relative text-white">
                 <div>
@@ -94,8 +94,8 @@ const SessionDetails = () => {
                                 uploadMaterials={checkRole(UserRoleType.TRAINER)}
                                 giveFeedback={true}
                                 uploadAssignment={checkRole(UserRoleType.CANDIDATE)}
-                                viewCandidateFeedback = {decoded.isAdmin}
-                                viewTrainerFeedback = {decoded.isAdmin}
+                                viewCandidateFeedback={decoded.isAdmin}
+                                viewTrainerFeedback={decoded.isAdmin}
                             />
                         </div>
                     </div>

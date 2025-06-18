@@ -1,16 +1,28 @@
-
-import { useGetUserDashboardDataQuery } from "../../api-service/user/user.api";
+import { useNavigate, useParams } from "react-router-dom";
+import { useGetTrainingByUserIdQuery, useGetTrainingListQuery } from "../../api-service/training/training.api";
 import DashboardCardList from "../../components/dashboardCardList/DashboardCardList";
 import EventList, { formatTrainingList } from "../../components/eventList/EventList";
 import Layout from "../../components/layout/Layout";
-import { useParams } from "react-router-dom";
+import {  useGetUserDashboardDataQuery } from "../../api-service/user/user.api";
 
 const CommonDashboard = () => {
+    const navigate = useNavigate();
     const { userId } = useParams();
-    const { data: userDashboardData, isLoading } = useGetUserDashboardDataQuery({ id: userId  });
-    
+
+    const { data: trainingDetailsList, isLoading, error } = useGetTrainingByUserIdQuery({ id: userId });
+
+    if (isLoading) {
+        return <Layout title="Your Dashboard"><p className="text-white p-5">Loading...</p></Layout>;
+    }
+
+    if (error) {
+        return <Layout title="Your Dashboard"><p className="text-red-500 p-5">Failed to load training data.</p></Layout>;
+    }
+
+    const formattedTrainings = formatTrainingList(trainingDetailsList?.totalPrograms || []);
+
     return (
-        <Layout title="Dashboard" isLoading={isLoading}>
+        <Layout title="Your Dashboard">
             <div className="flex flex-col items-center justify-center gap-10 p-5">
                 <DashboardCardList
                     data={[
@@ -22,11 +34,10 @@ const CommonDashboard = () => {
                     ]}
                 />
                 <EventList
-
+                isAdmin={false}
                     heading="Trainings"
                     showCreateButton={false}
-                    data={formatTrainingList(userDashboardData?.totalPrograms)}
-
+                    data={formattedTrainings}
                 />
             </div>
         </Layout>

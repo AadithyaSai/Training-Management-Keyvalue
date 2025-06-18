@@ -1,4 +1,6 @@
-import React, { useState, type DragEvent, type ChangeEvent } from "react";
+import React, { useState, type DragEvent, type ChangeEvent, useEffect } from "react";
+import { useGetSessionByIdQuery } from "../../../../api-service/session/session.api";
+import { useParams } from "react-router-dom";
 
 interface UploadAssignmentsModalProps {
   isOpen: boolean;
@@ -9,8 +11,21 @@ export const UploadAssignmentsModal: React.FC<UploadAssignmentsModalProps> = ({
   isOpen,
   onClose,
 }) => {
+   const [sessionDetails, setSessionDetails] = useState({
+          title: ""
+      });
   const [files, setFiles] = useState<File[]>([]);
   const [dragActive, setDragActive] = useState(false);
+  const { trainingId, sessionId } = useParams();
+  const { data: sessionDetailsData } = useGetSessionByIdQuery({ id: sessionId });
+
+  useEffect(() => {
+          if (!sessionDetailsData)
+              return
+          setSessionDetails({
+              title: sessionDetailsData.title
+          })
+      }, [sessionDetailsData])
 
   if (!isOpen) return null;
 
@@ -52,7 +67,7 @@ export const UploadAssignmentsModal: React.FC<UploadAssignmentsModalProps> = ({
           <button onClick={onClose} className="text-2xl hover:text-red-500">&times;</button>
         </div>
         <div className="mt-5">
-          <label className="text-sm mb-2 block">Session Name</label>
+          <label className="text-sm mb-2 block">{sessionDetails.title}</label>
         </div>
         <div
           className={`mt-2 border-2 ${

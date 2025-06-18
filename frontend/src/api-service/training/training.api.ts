@@ -7,6 +7,14 @@ export const trainingApi = baseApi.injectEndpoints({
             providesTags: [ApiTagType.TRAINING]
         }),
 
+        getTrainingByUserId: builder.query({
+            query: (payload) => ({
+                url: `/analytics/users/${payload.id}`,
+                method: "GET"
+            }),
+            providesTags: [ApiTagType.TRAINING]
+        }),
+
         getTrainingById: builder.query({
             query: (payload) => ({
                 url: `/trainings/${payload.id}`,
@@ -48,5 +56,6 @@ export const {
     useGetTrainingByIdQuery,
     useCreateTrainingMutation,
     useUpdateTrainingMutation,
-    useDeleteTrainingMutation
+    useDeleteTrainingMutation,
+    useGetTrainingByUserIdQuery
 } = trainingApi;
