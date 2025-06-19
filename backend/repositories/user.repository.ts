@@ -14,7 +14,7 @@ export default class UserRepository {
   async findOneById(id: number): Promise<User | null> {
     return this.repository.findOne({
       where: { id },
-      select: ["id", "name", "username", "email", "isAdmin"],
+      relations: ["userSessions"],
     });
   }
 
@@ -46,5 +46,4 @@ export default class UserRepository {
   async countUsers(): Promise<number> {
     return this.repository.count();
   }
-  
 }

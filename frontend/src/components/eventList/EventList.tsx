@@ -1,4 +1,6 @@
 import dayjs from "dayjs";
+import { jwtDecode } from "jwt-decode";
+import { Layout } from "lucide-react";
 import { useState } from "react";
 import { CiPlay1 } from "react-icons/ci";
 import { FaSearch } from "react-icons/fa";
@@ -29,6 +31,7 @@ export type EventProps = {
 type EventItem = {
     item: EventProps;
     heading: string;
+    isAdmin: boolean;
 };
 
 type EventListProps = {
@@ -134,13 +137,16 @@ const EventList: React.FC<EventListProps> = ({
                 statusFilter.toLowerCase() == "all" ||
                 item.status === statusFilter)
     );
+    const token = localStorage.getItem("token")
+    const decoded: { isAdmin: boolean } = jwtDecode(token || "");
+    const isAdmin = decoded.isAdmin;
     return (
         <div className=" text-white w-full">
             <div className="flex flex-col items-center border border-borderColor px-2 py-4 rounded-lg bg-cardColor">
                 <div className="flex justify-between items-center mb-4 p-4 rounded-lg bg-cardColor w-full">
                     <h2 className="text-3xl font-bold">{heading}</h2>
                     <div className="flex items-center space-x-3">
-                        {showCreateButton && (
+                        {isAdmin && showCreateButton &&  (
                             <button
                                 className="bg-white text-black px-4 py-2 rounded hover:bg-gray-200"
                                 onClick={onCreateClick}
@@ -211,6 +217,7 @@ const EventList: React.FC<EventListProps> = ({
                     ) : (
                         filteredData.map((item, index) => (
                             <EventListItem
+                                isAdmin={isAdmin}
                                 key={index}
                                 item={item}
                                 heading={heading.slice(0, -1).toLowerCase()}

@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 
 import HTTPException from "../exceptions/http.exception";
 import { SessionService } from "../services/session.service";
-import { CreateSessionDto, UpdateSessionDto } from "../dto/session.dto";
+import { CreateSessionDto, CreateSessionsDto, UpdateSessionDto, UpdateSessionsDto } from "../dto/session.dto";
 import { plainToInstance } from "class-transformer";
 import { validate } from "class-validator";
 import { CreateUserSessionDto, DeleteUserSessionDto } from "../dto/user-session.dto";
@@ -10,7 +10,6 @@ import { UserSession } from "../entities/user-session.entity";
 
 export class SessionController {
   constructor(private sessionService: SessionService) {}
-
   async createSession(req: Request, res: Response, next: NextFunction) {
     try {
       const sessionDto = plainToInstance(CreateSessionDto, req.body);
@@ -30,6 +29,49 @@ export class SessionController {
       next(error);
     }
   }
+
+  async createSessions(req: Request, res: Response, next: NextFunction) {
+    try {
+      const sessionDto = plainToInstance(CreateSessionsDto, req.body);
+
+      const errors = await validate(sessionDto);
+      if (errors.length > 0) {
+        return res.status(400).json({
+          message: "Validation failed for session",
+          errors: errors.map((error) => error.constraints),
+        });
+      }
+
+      const session = await this.sessionService.createSessions(sessionDto);
+
+      res.status(201).json(session);
+    } catch (error) {
+      next(error);
+    }
+  }
+  async updateSessions(req: Request, res: Response, next: NextFunction) {
+    try {
+      const sessionDto = plainToInstance(UpdateSessionsDto, req.body);
+      console.log("heloooooooo",sessionDto);
+      const errors = await validate(sessionDto);
+      console.log(errors);
+      if (errors.length > 0) {
+        return res.status(400).json({
+          message: "Validation failed for session",
+          errors: errors.map((error) => error.constraints),
+        });
+
+      }
+
+      const session = await this.sessionService.updateSessions(sessionDto);
+
+      res.status(201).json(session);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+
   async getAllSessions(req: Request, res: Response, next: NextFunction) {
     try {
       const users = await this.sessionService.findAllSessions();
@@ -62,6 +104,17 @@ export class SessionController {
     try {
       const sessionId = parseInt(req.params.id, 10);
       const session = await this.sessionService.findOneById(sessionId);
+
+      res.status(200).json(session);
+    } catch (error) {
+      next(error);
+    }
+  }
+  async getRoleInSession(req: Request, res: Response, next: NextFunction) {
+    try {
+      const sessionId = parseInt(req.params.id, 10);
+      const userId=parseInt(req.params.userId);
+      const session = await this.sessionService.findRoleInSession(sessionId,userId);
 
       res.status(200).json(session);
     } catch (error) {

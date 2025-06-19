@@ -5,6 +5,9 @@ import { useLoginMutation } from "../../../api-service/auth/login.api";
 import Button, { ButtonType } from "../../../components/button/Button";
 import { toast } from "react-toastify";
 
+import { jwtDecode } from "jwt-decode";
+
+
 type SliderPosition = "left" | "right";
 
 type LoginFormSectionProps = {
@@ -104,11 +107,22 @@ const LoginForm = () => {
             .then((data) => {
                 localStorage.setItem("token", data.accessToken);
                 setSigninData({ username: "", password: "" });
-                navigate("/dashboard");
+
+                const decoded: { id: number; isAdmin: boolean } = jwtDecode(
+                    data.accessToken
+                );
+                const isAdmin = decoded.isAdmin; 
+
+                if (isAdmin) {
+                    navigate("/adminDashboard");
+                } else {
+                    navigate(`/dashboard/${decoded.id}`);
+                }
+
             })
             .catch((error) => {
                 setSigninData({ username: "", password: "" });
-                toast(`Error: ${error.data.error || "Something went wrong"}`);
+                toast.error(`Error: ${error.data.error || "Something went wrong"}`,  { autoClose: 2000 });
             });
     };
 

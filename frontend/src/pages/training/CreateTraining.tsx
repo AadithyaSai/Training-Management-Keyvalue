@@ -2,7 +2,11 @@ import ActionButton from "../../components/actionButton/ActionButton";
 import Button, { ButtonType } from "../../components/button/Button";
 import Layout from "../../components/layout/Layout";
 import FormInput from "../../components/formInput/FormInput";
+<<<<<<< HEAD
+import { useState, type FormEvent } from "react";
+=======
 import { useEffect, useState, type FormEvent } from "react";
+>>>>>>> origin/frontend
 import { useNavigate } from "react-router-dom";
 import { useCreateTrainingMutation } from "../../api-service/training/training.api";
 import {

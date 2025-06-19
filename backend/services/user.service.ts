@@ -1,4 +1,4 @@
-import { compare, hash } from "bcrypt";
+import { hash } from "bcrypt";
 
 import type UserRepository from "../repositories/user.repository";
 import HTTPException from "../exceptions/http.exception";
@@ -8,7 +8,7 @@ import { User } from "../entities/user.entity";
 import LoggerService from "./logger.service";
 
 export default class UserService {
-  private logger = LoggerService.getInstance("UserService()");
+  private logger = LoggerService.getInstance(UserService.name);
 
   constructor(private userRepository: UserRepository) {}
 
@@ -93,7 +93,7 @@ export default class UserService {
     return count;
   }
 
-  async findOneByUsername(username: string) : Promise<User | null>{
+  async findOneByUsername(username: string): Promise<User | null> {
     const user = await this.userRepository.findOneByUsername(username);
     if (!user) {
       throw new Error("Invalid username");

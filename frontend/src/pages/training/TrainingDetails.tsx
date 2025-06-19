@@ -12,41 +12,50 @@ import {
 } from "../../api-service/training/training.api";
 import Button, { ButtonType } from "../../components/button/Button";
 import { useEffect } from "react";
+import { jwtDecode } from "jwt-decode";
 
 const TrainingDetails = () => {
     const { trainingId } = useParams();
     const navigate = useNavigate();
 
-    const { data: trainingDetails } = useGetTrainingByIdQuery({
+    const { data: trainingDetails, isLoading } = useGetTrainingByIdQuery({
         id: trainingId,
     });
-    const [deleteTraining] = useDeleteTrainingMutation();
-    useEffect(()=>{console.log(trainingDetails)}, [trainingDetails])
 
-    if (!trainingDetails) return <></>;
+    const token = localStorage.getItem("token");
+    const decoded: { isAdmin: boolean }  = jwtDecode(token || "");
+    const isAdmin = decoded.isAdmin;
+
+    const [deleteTraining] = useDeleteTrainingMutation();
+    useEffect(() => {
+        console.log(trainingDetails);
+    }, [trainingDetails]);
 
 
     return (
         <Layout
-            title={trainingDetails.title}
+            title={trainingDetails?.title || "Training"}
+            isLoading={isLoading || !trainingDetails}
             endAdornments={
-                <div className="flex gap-3">
-                    <Button
-                        variant={ButtonType.SECONDARY}
-                        onClick={() => navigate("update")}
-                    >
-                        Update
-                    </Button>
-                    <Button
-                        variant={ButtonType.SECONDARY}
-                        onClick={() => {
-                            deleteTraining({ id: trainingId });
-                            navigate("/dashboard");
-                        }}
-                    >
-                        Delete
-                    </Button>
-                </div>
+                isAdmin && (
+                    <div className="flex gap-3">
+                        <Button
+                            variant={ButtonType.SECONDARY}
+                            onClick={() => navigate("update")}
+                        >
+                            Update
+                        </Button>
+                        <Button
+                            variant={ButtonType.SECONDARY}
+                            onClick={() => {
+                                deleteTraining({ id: trainingId });
+                                navigate("/adminDashboard");
+                            }}
+                        >
+                            Delete
+                        </Button>
+                    </div>
+                )
             }
         >
             <div className="flex flex-col items-center justify-center gap-10 p-5">
@@ -70,9 +79,9 @@ const TrainingDetails = () => {
                 />
                 <EventList
                     heading="Sessions"
-                    showCreateButton={true}
+                    showCreateButton={isAdmin}
                     onCreateClick={() => navigate("session/create")}
-                    data={formatTrainingList(trainingDetails.sessions)}
+                    data={formatTrainingList(trainingDetails?.sessions)}
                 />
             </div>
         </Layout>

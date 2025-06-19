@@ -107,6 +107,18 @@ async UpdateUserRole(
     );
     return this.repository.save(insertValues);
   }
+
+  async getUserRoleInSession(sessionId: number, userId: number): Promise<Role | null> {
+    const userSession = await this.repository.findOne({
+      where: {
+        session: { id: sessionId },
+        user: { id: userId },
+      },
+      relations: ['user', 'session'],
+    });
+
+    return userSession?.role || null;
+  }
   // Update a user's role in a session
   // async updateRole(userId: number, sessionId: number, newRole: Role): Promise<void> {
   //   await this.repository.update(

@@ -59,7 +59,9 @@ export class Session extends AbstractBaseEntity {
 	@OneToMany(() => Feedback, (feedbacks) => feedbacks.session, {})
 	feedbacks?: Feedback[];
 
-	@OneToMany(() => UserSession, (userSession) => userSession.session)
+	@OneToMany(() => UserSession, (userSession) => userSession.session, {
+		cascade: true,
+	})
 	userSessions?: UserSession[];
 
 	@OneToMany(() => Material, (material) => material.session, {

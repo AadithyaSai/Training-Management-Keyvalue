@@ -19,6 +19,8 @@ export default class AssignmentSubmission extends AbstractBaseEntity {
   @ManyToOne(() => User, (user) => user.assignments)
   user: User;
 
-  @ManyToOne(() => Assignment, (assignment) => assignment.submissions)
+  @ManyToOne(() => Assignment, (assignment) => assignment.submissions, {
+    onDelete: "CASCADE",
+  })
   assignment: Assignment;
 }

@@ -17,12 +17,14 @@ const sessionRouter=Router();
 
 sessionRouter.get("/upcoming", sessionController.getUpcomingSessions.bind(sessionController));
 sessionRouter.get("/", sessionController.getAllSessions.bind(sessionController));
+sessionRouter.post("/sessions", sessionController.createSessions.bind(sessionController));
 sessionRouter.post("/", sessionController.createSession.bind(sessionController));
 sessionRouter.get("/today", sessionController.getTodaySessions.bind(sessionController));
 sessionRouter.get("/:id", sessionController.getSessionById.bind(sessionController));
+sessionRouter.patch("/", sessionController.updateSessions.bind(sessionController));
 sessionRouter.patch("/:id", sessionController.updateSession.bind(sessionController));
 sessionRouter.delete("/:id", sessionController.deleteSession.bind(sessionController));
-
+sessionRouter.get( "/:id/roles/:userId",sessionController.getRoleInSession.bind(sessionController));
 sessionRouter.post( "/:id/roles",sessionController.addUsersToSession.bind(sessionController));
 sessionRouter.delete( "/:id/roles",sessionController.removeUsersFromSession.bind(sessionController));
 sessionRouter.get("/:id", sessionController.getAllUserSessions.bind(sessionController));

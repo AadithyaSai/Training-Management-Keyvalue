@@ -5,6 +5,8 @@ import { userService } from "../routes/user.route";
 import { Session } from "../entities/session.entity";
 import LoggerService from "./logger.service";
 import { sessionService } from "../routes/session.routes";
+import { ENABLE_AI, FASTAPI_URL } from "../utils/constants";
+import { title } from "process";
 
 export class FeedbackService {
 	private logger = LoggerService.getInstance(FeedbackService.name);
@@ -126,6 +128,22 @@ export class FeedbackService {
 		if (!session) {
 			throw new Error(`Invalid session ID`);
 		}
-		return this.feedbackRepository.getBySessionAndType(type, sessionId);
+
+		const feedbacks = this.feedbackRepository.getBySessionAndType(
+			type,
+			sessionId
+		);
+		if (ENABLE_AI) {
+			const comments = (await feedbacks).map(
+				(feedback) => feedback.comments
+			);
+			this.logger.info("Comments:" + comments);
+			await sessionService.updateAiFeedbackForSession(
+				sessionId,
+				comments
+			);
+		}
+
+		return feedbacks;
 	}
 }

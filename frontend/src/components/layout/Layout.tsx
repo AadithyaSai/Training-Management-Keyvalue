@@ -1,3 +1,4 @@
+import { PacmanLoader } from "react-spinners";
 import Header from "../header/Header";
 import Navbar from "../navbar/Navbar";
 import { ToastContainer } from "react-toastify";
@@ -6,6 +7,7 @@ interface LayoutProps {
     title?: string;
     children?: React.ReactNode;
     endAdornments?: React.ReactNode;
+    isLoading?: boolean;
 }
 
 const LightEffect = () => {
@@ -22,17 +24,28 @@ const LightEffect = () => {
     );
 };
 
-const Layout: React.FC<LayoutProps> = ({ title, children, endAdornments }) => {
+const Layout: React.FC<LayoutProps> = ({
+    title,
+    children,
+    endAdornments,
+    isLoading,
+}) => {
     return (
         <div className="flex flex-col min-h-screen bg-bgColor">
-            <ToastContainer/>
+            <ToastContainer toastClassName="custom-toast" />
             <Header title={title} endAdornments={endAdornments} />
             <Navbar />
             <div className="flex mt-headerHeight">
                 <div className="w-full h-bodyHeight relative ml-navbarWidth">
                     <LightEffect />
                     <main className="p-6 overflow-y-auto w-full h-full relative z-10">
-                        {children}
+                        {isLoading ? (
+                            <div className="flex items-center justify-center w-full h-full">
+                                <PacmanLoader color="#fff" size={30}/>
+                            </div>
+                        ) : (
+                            children
+                        )}
                     </main>
                 </div>
             </div>

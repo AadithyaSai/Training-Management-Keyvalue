@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { X } from "lucide-react";
 import Layout from "../../components/layout/Layout";
 import FormInput from "../../components/formInput/FormInput";
@@ -92,10 +92,10 @@ const SelectModal: React.FC<SelectModalProps> = ({
 const CreateSession = () => {
   const [sessionDetails, setSessionDetails] = useState({
     programId: 4,
-    title: "s1",
-    description: "desc",
-    date: "2020-07-10",
-    duration: 3,
+    title: "",
+    description: "",
+    date: "",
+    duration: 0,
   });
 
   const { trainingId } = useParams();
@@ -227,4 +227,5 @@ const CreateSession = () => {
     </Layout>
   );
 };
+
 export default CreateSession;

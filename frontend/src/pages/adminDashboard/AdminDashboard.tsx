@@ -1,15 +1,16 @@
 import { useNavigate } from "react-router-dom";
 import { useGetTrainingListQuery } from "../../api-service/training/training.api";
 import DashboardCardList from "../../components/dashboardCardList/DashboardCardList";
-import EventList, { formatTrainingList } from "../../components/eventList/EventList";
+import EventList, {
+    formatTrainingList,
+} from "../../components/eventList/EventList";
 import Layout from "../../components/layout/Layout";
 
 const AdminDashboard = () => {
     const navigate = useNavigate();
-    const { data: trainingDetailsList } = useGetTrainingListQuery({});
-
+    const { data: trainingDetailsList, isLoading } = useGetTrainingListQuery({});
     return (
-        <Layout title="Admin Dashboard">
+        <Layout title="Admin Dashboard" isLoading={isLoading}>
             <div className="flex flex-col items-center justify-center gap-10 p-5">
                 <DashboardCardList
                     data={[

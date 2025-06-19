@@ -8,6 +8,8 @@ import { UploadAssignmentsModal } from "./modals/UploadAssignmentsModal";
 
 interface SessionActionButtonsProps {
     userRole: UserRole;
+    sessionId: number;
+    trainerId?: number;
     uploadAssignment?: boolean;
     giveFeedback?: boolean;
     uploadMaterials?: boolean;
@@ -15,6 +17,8 @@ interface SessionActionButtonsProps {
 
 export const SessionActionButtons: React.FC<SessionActionButtonsProps> = ({
     userRole,
+    sessionId,
+    trainerId,
     uploadAssignment = false,
     giveFeedback = false,
     uploadMaterials = false,
@@ -50,10 +54,15 @@ export const SessionActionButtons: React.FC<SessionActionButtonsProps> = ({
                         Give Feedback
                     </Button>
                     <CandidateListModal
+                        sessionId={sessionId}
+                        userRole={userRole}
                         isOpen={candidateListModalOpen}
                         onClose={() => setCandidateListModalOpen(false)}
                     />
                     <FeedbackModal
+                        sessionId={sessionId}
+                        trainerId={trainerId}
+                        userRole={userRole}
                         isOpen={feedbackModalOpen}
                         onClose={() => setFeedbackModalOpen(false)}
                     />

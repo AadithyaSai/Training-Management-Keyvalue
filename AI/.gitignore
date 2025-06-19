@@ -1,0 +1,10 @@
+venv/
+__pycache__/
+*.pyc
+.env
+.DS_Store
+token.json
+credentials.json
+extracted_content.json
+downloads/
+test.py

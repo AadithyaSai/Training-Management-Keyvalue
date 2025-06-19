@@ -1,30 +1,32 @@
 import {
-    IsString,
-    IsNotEmpty,
-    IsOptional,
-    IsNumber,
-    Min,
-    Max,
+	IsString,
+	IsNotEmpty,
+	IsOptional,
+	IsNumber,
+	Min,
+	Max,
 } from "class-validator";
 
 export class CreateMaterialDto {
-    @IsNotEmpty()
-    @IsNumber()
-    session_id:number;
-    @IsString()
-    @IsNotEmpty()
-    link: string;
+	@IsNotEmpty()
+	// @IsNumber()
+	sessionId: number;
 
+	@IsString()
+	@IsNotEmpty()
+	link: string;
+
+	file: File;
 }
 
 export class UpdateMaterialDto {
-    @IsOptional()
-    @IsNumber()
-    session_id:number;
+	@IsOptional()
+	// @IsNumber()
+	sessionId: number;
 
-    
-    @IsString()
-    @IsOptional()
-    link: string;
-    
+	@IsString()
+	@IsOptional()
+	link: string;
+
+	file: File;
 }
