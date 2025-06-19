@@ -44,6 +44,7 @@ const UpdateTraining = () => {
       id: trainingId,
       data: {
         ...trainingDetails,
+        members: members,
       },
     })
       .unwrap()

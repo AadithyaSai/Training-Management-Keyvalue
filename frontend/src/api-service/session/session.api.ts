@@ -47,6 +47,13 @@ export const sessionApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: [ApiTagType.TRAINING, ApiTagType.SESSION],
     }),
+    addMembersToSession: builder.mutation({
+      query: (payload) => ({
+        url: `/session/${payload.id}/roles`,
+        method: "POST",
+        body: payload.members,
+      }),
+    }),
   }),
 });
 
@@ -56,5 +63,6 @@ export const {
   useCreateSessionMutation,
   useUpdateSessionMutation,
   useDeleteSessionMutation,
+  useAddMembersToSessionMutation,
   useUpdateMultipleSessionsMutation,
 } = sessionApi;
