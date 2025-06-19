@@ -1,45 +1,108 @@
+// import { useNavigate } from "react-router-dom";
+// import Button from "../button/Button";
+
+// const NavbarItem = ({
+//   label = "label",
+//   icon = "icon",
+// }: {
+//   label?: string;
+//   icon?: string;
+// }) => {
+//   return (
+//     <li>
+//       <a
+//         href="#"
+//         className="flex justify-between items-center w-9/10 border-2 border-borderColor border-l-transparent bg-cardColor rounded-r-full p-4 pr-6"
+//       >
+//         <p className="text-white text-lg">{label}</p>
+//         <span className="text-white text-lg">{icon}</span>
+//       </a>
+//     </li>
+//   );
+// };
+
+// const Navbar = () => {
+//   const navigate = useNavigate(); 
+//   function OnHandleLogOut():void{
+//           localStorage.removeItem("token");
+//           console.log("LOGOUT");
+//           localStorage.setItem("isLogged", "false");
+//           navigate("/", { replace: true });
+//   }
+
+//   return (
+//     <nav
+//       className={`fixed top-headerHeight -translate-y-2px left-0 bottom-0 w-navbarWidth h-full bg-cardColor text-white shadow-lg py-8 z-40 border-2 border-borderColor border-t-transparent`}
+//     >
+//       <ul className="space-y-4">
+//         <NavbarItem label="Training" icon="🏠" />
+//         <NavbarItem label="Upcoming Sessions" icon="🏠" />
+//         <Button onClick={()=>OnHandleLogOut()} className="logout">LOGOUT</Button>
+         
+//       </ul>
+//     </nav>
+//   );
+// };
+
+// export default Navbar;
+
 import { useNavigate } from "react-router-dom";
-import Button from "../button/Button";
+
+interface NavbarItemProps {
+  label?: string;
+  icon?: string;
+  navTo?: string;
+}
 
 const NavbarItem = ({
   label = "label",
   icon = "icon",
-}: {
-  label?: string;
-  icon?: string;
-}) => {
+  navTo = "",
+}: NavbarItemProps) => {
+  const navigate = useNavigate();
+
   return (
-    <li>
-      <a
-        href="#"
-        className="flex justify-between items-center w-9/10 border-2 border-borderColor border-l-transparent bg-cardColor rounded-r-full p-4 pr-6"
+    <li onClick={() => navigate(navTo)} className="cursor-pointer">
+      <div
+        className="flex justify-between items-center w-full border-2 border-borderColor border-l-transparent bg-cardColor rounded-r-full p-4 pr-6
+                   transition-all duration-300 ease-in-out hover:bg-[#2c2c2c] hover:translate-x-1"
       >
         <p className="text-white text-lg">{label}</p>
         <span className="text-white text-lg">{icon}</span>
-      </a>
+      </div>
     </li>
   );
 };
 
 const Navbar = () => {
-  const navigate = useNavigate(); 
-  function OnHandleLogOut():void{
-          localStorage.removeItem("token");
-          console.log("LOGOUT");
-          localStorage.setItem("isLogged", "false");
-          navigate("/", { replace: true });
-  }
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/", { replace: true });
+  };
 
   return (
-    <nav
-      className={`fixed top-headerHeight -translate-y-2px left-0 bottom-0 w-navbarWidth h-full bg-cardColor text-white shadow-lg py-8 z-40 border-2 border-borderColor border-t-transparent`}
-    >
-      <ul className="space-y-4">
-        <NavbarItem label="Training" icon="🏠" />
-        <NavbarItem label="Upcoming Sessions" icon="🏠" />
-        <Button onClick={()=>OnHandleLogOut()} className="logout">LOGOUT</Button>
-         
-      </ul>
+    <nav className="fixed top-headerHeight left-0 bottom-0 w-navbarWidth bg-cardColor text-white shadow-lg py-8 z-40 border-2 border-borderColor border-t-transparent flex flex-col">
+      <div className="flex-1 overflow-y-auto px-4">
+        <ul className="space-y-4">
+          <NavbarItem label="Trainings" icon="🏠" navTo="/adminDashboard" />
+          <NavbarItem
+            label="Upcoming Sessions"
+            icon="📅"
+            navTo="/upcomingSessions"
+          />
+        </ul>
+      </div>
+
+      <div className="px-4 pt-4">
+        <button
+          onClick={handleLogout}
+          className="w-full bg-red-600 hover:bg-red-700 transition-all duration-300 text-white py-2 px-4 rounded-full"
+        >
+          Logout
+        </button>
+      </div>
     </nav>
   );
 };

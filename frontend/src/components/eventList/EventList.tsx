@@ -1,6 +1,4 @@
 import dayjs from "dayjs";
-import { jwtDecode } from "jwt-decode";
-import { Layout } from "lucide-react";
 import { useState } from "react";
 import { CiPlay1 } from "react-icons/ci";
 import { FaSearch } from "react-icons/fa";
@@ -36,6 +34,7 @@ type EventItem = {
 
 type EventListProps = {
     heading: string;
+    isAdmin: boolean;
     showCreateButton?: boolean;
     onCreateClick?: () => void;
     data?: EventProps[];
@@ -61,7 +60,7 @@ const EventListItem: React.FC<EventItem> = ({ item, heading }) => {
     const navigate = useNavigate();
     return (
         <div
-            className="border border-gray-700 p-4 rounded-lg bg-cardColor cursor-pointer"
+            className="border border-gray-700 p-4 rounded-lg bg-cardColor cursor-pointer transform transition-all duration-300 ease-in-out hover:scale-[1.015] hover:shadow-lg hover:bg-[#2c2c2c]"
             onClick={() =>
                 heading == "session"
                     ? navigate(`session/${item.id}`)
@@ -69,7 +68,9 @@ const EventListItem: React.FC<EventItem> = ({ item, heading }) => {
             }
         >
             <div className="flex items-center justify-between">
-                <h3 className="text-xl font-semibold">{item.title}</h3>
+                <h3 className="text-xl font-semibold text-white">
+                    {item.title}
+                </h3>
                 {item.status && (
                     <span className="text-sm text-green-400 flex items-center gap-1">
                         <CiPlay1 />
@@ -80,32 +81,36 @@ const EventListItem: React.FC<EventItem> = ({ item, heading }) => {
             <div className="flex flex-col gap-1 mt-2">
                 <p className="text-sm mt-1 text-gray-400">{item.description}</p>
                 {heading == "session" ? (
-                    <p className="text-sm mt-1">
+                    <p className="text-sm mt-1 text-white">
                         Date : {dayjs(item.date).format("DD/MM/YYYY")}
                     </p>
                 ) : (
                     <>
-                        <p className="text-sm mt-1">
+                        <p className="text-sm mt-1 text-white">
                             Start date :{" "}
                             {dayjs(item.startDate).format("DD/MM/YYYY")}
                         </p>
-                        <p className="text-sm mt-1">
+                        <p className="text-sm mt-1 text-white">
                             End date :{" "}
                             {dayjs(item.endDate).format("DD/MM/YYYY")}
                         </p>
                     </>
                 )}
                 {item.trainer && (
-                    <p className="text-sm mt-1">Trainer : {item.trainer}</p>
+                    <p className="text-sm mt-1 text-white">
+                        Trainer : {item.trainer}
+                    </p>
                 )}
                 {item.totalSessions !== undefined && (
-                    <p className="text-sm mt-1">
+                    <p className="text-sm mt-1 text-white">
                         Total sessions : {item.totalSessions}
                     </p>
                 )}
                 {item.progress !== undefined && (
                     <div className="mt-2">
-                        <p className="text-sm">Progress : {item.progress}%</p>
+                        <p className="text-sm text-white">
+                            Progress : {item.progress}%
+                        </p>
                         <div className="w-full bg-gray-700 rounded-full h-2 mt-2">
                             <div
                                 className="bg-white h-2 rounded-full"
@@ -121,6 +126,7 @@ const EventListItem: React.FC<EventItem> = ({ item, heading }) => {
 
 const EventList: React.FC<EventListProps> = ({
     heading,
+    isAdmin,
     showCreateButton = false,
     onCreateClick,
     data,
@@ -137,16 +143,13 @@ const EventList: React.FC<EventListProps> = ({
                 statusFilter.toLowerCase() == "all" ||
                 item.status === statusFilter)
     );
-    const token = localStorage.getItem("token")
-    const decoded: { isAdmin: boolean } = jwtDecode(token || "");
-    const isAdmin = decoded.isAdmin;
     return (
-        <div className=" text-white w-full">
+        <div className="text-white w-full">
             <div className="flex flex-col items-center border border-borderColor px-2 py-4 rounded-lg bg-cardColor">
                 <div className="flex justify-between items-center mb-4 p-4 rounded-lg bg-cardColor w-full">
                     <h2 className="text-3xl font-bold">{heading}</h2>
                     <div className="flex items-center space-x-3">
-                        {isAdmin && showCreateButton &&  (
+                        {isAdmin && showCreateButton && (
                             <button
                                 className="bg-white text-black px-4 py-2 rounded hover:bg-gray-200"
                                 onClick={onCreateClick}
@@ -200,7 +203,7 @@ const EventList: React.FC<EventListProps> = ({
                             <input
                                 type="text"
                                 placeholder="Search"
-                                className="px-2 py-2 outline-none text-white"
+                                className="px-2 py-2 outline-none text-white bg-transparent"
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />

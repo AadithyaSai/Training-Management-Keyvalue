@@ -32,7 +32,9 @@ const SelectModal: React.FC<SelectModalProps> = ({
     const toggleOption = (option: string) => {
         if (multiSelect) {
             if (localSelection.includes(option)) {
-                setLocalSelection(localSelection.filter((item) => item !== option));
+                setLocalSelection(
+                    localSelection.filter((item) => item !== option)
+                );
             } else {
                 setLocalSelection([...localSelection, option]);
             }
@@ -45,14 +47,19 @@ const SelectModal: React.FC<SelectModalProps> = ({
         <div className="fixed inset-0 w-full h-full bg-modalBgColor flex items-center justify-center z-50">
             <div className="bg-cardColor border border-borderColor rounded-lg p-6 w-full max-w-md max-h-[80vh] overflow-y-auto">
                 <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-lg font-semibold text-white">{title}</h2>
+                    <h2 className="text-lg font-semibold text-white">
+                        {title}
+                    </h2>
                     <Button onClick={onClose}>
                         <X className="text-gray-300 hover:text-white" />
                     </Button>
                 </div>
                 <div className="space-y-2">
                     {options.map((option) => (
-                        <label key={option} className="flex items-center gap-2 text-white">
+                        <label
+                            key={option}
+                            className="flex items-center gap-2 text-white"
+                        >
                             <input
                                 type={multiSelect ? "checkbox" : "radio"}
                                 checked={localSelection.includes(option)}
@@ -99,10 +106,11 @@ const UpdateSession = () => {
 
     const navigate = useNavigate();
     const { trainingId, sessionId } = useParams();
-    const { data: sessionDetailsData } = useGetSessionByIdQuery({ id: sessionId });
+    const { data: sessionDetailsData } = useGetSessionByIdQuery({
+        id: sessionId,
+    });
 
     const [updateSession, { isLoading }] = useUpdateSessionMutation();
-
 
     useEffect(() => {
         if (sessionDetailsData) {
@@ -118,11 +126,18 @@ const UpdateSession = () => {
 
     const validateForm = () => {
         const newErrors: { [key: string]: string } = {};
-        if (!sessionDetails.title.trim() || sessionDetails.title.trim().length < 3) {
+        if (
+            !sessionDetails.title.trim() ||
+            sessionDetails.title.trim().length < 3
+        ) {
             newErrors.title = "Title must be at least 3 characters.";
         }
-        if (!sessionDetails.description.trim() || sessionDetails.description.trim().length < 10) {
-            newErrors.description = "Description must be at least 10 characters.";
+        if (
+            !sessionDetails.description.trim() ||
+            sessionDetails.description.trim().length < 10
+        ) {
+            newErrors.description =
+                "Description must be at least 10 characters.";
         }
         if (sessionDetails.duration <= 0) {
             newErrors.duration = "Duration must be greater than 0.";
@@ -131,8 +146,8 @@ const UpdateSession = () => {
             newErrors.trainer = "Please select one trainer.";
         }
         return newErrors;
+    };
 
-   
     const handleSubmit = () => {
         const validationErrors = validateForm();
         if (Object.keys(validationErrors).length > 0) {
@@ -156,17 +171,23 @@ const UpdateSession = () => {
     return (
         <Layout title="Update Session" isLoading={isLoading}>
             <div className="flex flex-col w-full gap-6 mb-6 bg-cardColor border border-borderColor p-4 rounded">
-
                 <div>
                     <FormInput
                         name="session-name"
                         label="Session Name"
                         value={sessionDetails.title}
                         onChange={(e) =>
-                            setSessionDetails({ ...sessionDetails, title: e.target.value })
+                            setSessionDetails({
+                                ...sessionDetails,
+                                title: e.target.value,
+                            })
                         }
                     />
-                    {errors.title && <div className="text-red-500 text-sm">{errors.title}</div>}
+                    {errors.title && (
+                        <div className="text-red-500 text-sm">
+                            {errors.title}
+                        </div>
+                    )}
                 </div>
 
                 <div>
@@ -183,7 +204,9 @@ const UpdateSession = () => {
                         }
                     />
                     {errors.duration && (
-                        <div className="text-red-500 text-sm">{errors.duration}</div>
+                        <div className="text-red-500 text-sm">
+                            {errors.duration}
+                        </div>
                     )}
                 </div>
 
@@ -194,11 +217,16 @@ const UpdateSession = () => {
                         type="textarea"
                         value={sessionDetails.description}
                         onChange={(e) =>
-                            setSessionDetails({ ...sessionDetails, description: e.target.value })
+                            setSessionDetails({
+                                ...sessionDetails,
+                                description: e.target.value,
+                            })
                         }
                     />
                     {errors.description && (
-                        <div className="text-red-500 text-sm">{errors.description}</div>
+                        <div className="text-red-500 text-sm">
+                            {errors.description}
+                        </div>
                     )}
                 </div>
 
@@ -212,7 +240,9 @@ const UpdateSession = () => {
                         onClick={() => setShowTrainerModal(true)}
                     />
                     {errors.trainer && (
-                        <div className="text-red-500 text-sm">{errors.trainer}</div>
+                        <div className="text-red-500 text-sm">
+                            {errors.trainer}
+                        </div>
                     )}
                 </div>
 
@@ -225,14 +255,16 @@ const UpdateSession = () => {
                         }
                         onClick={() => setShowModeratorModal(true)}
                     />
-                    
                 </div>
 
                 <div className="flex justify-end gap-4">
                     <Button variant={ButtonType.PRIMARY} onClick={handleSubmit}>
                         Submit
                     </Button>
-                    <Button variant={ButtonType.SECONDARY} onClick={handleCancel}>
+                    <Button
+                        variant={ButtonType.SECONDARY}
+                        onClick={handleCancel}
+                    >
                         Cancel
                     </Button>
                 </div>

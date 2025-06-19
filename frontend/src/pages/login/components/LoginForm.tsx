@@ -114,7 +114,7 @@ const LoginForm = () => {
                 const isAdmin = decoded.isAdmin; 
 
                 if (isAdmin) {
-                    navigate("/adminDashboard");
+                    navigate(`/adminDashboard/${decoded.id}`);
                 } else {
                     navigate(`/dashboard/${decoded.id}`);
                 }

@@ -108,13 +108,9 @@ const SessionDetails = () => {
                                 trainerId={sessionDetails.trainer?.id || 0}
                                 sessionId={Number(sessionId)}
                                 userRole={userRole}
-                                uploadMaterials={
-                                    userRole === UserRoleType.TRAINER
-                                }
+                                uploadMaterials={userRole === UserRoleType.TRAINER}
                                 giveFeedback={true}
-                                uploadAssignment={
-                                    userRole === UserRoleType.CANDIDATE
-                                }
+                                uploadAssignment={userRole === UserRoleType.CANDIDATE}
                             />
                         </div>
                     </div>
