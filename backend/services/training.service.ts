@@ -13,7 +13,6 @@ export default class TrainingService {
     return this.trainingRepository.findOneById(id);
   }
 
-
   async createTraining(
     trainingDto: Partial<Training> & {
       members?: { userId: number; role: string }[];
@@ -31,8 +30,41 @@ export default class TrainingService {
     return training;
   }
 
-  async updateTraining(id: number, trainingDto: Partial<Training>) {
-    return this.trainingRepository.updateTraining(id, trainingDto);
+  // async updateTraining(id: number, trainingDto: Partial<Training>) {
+  //   return this.trainingRepository.updateTraining(id, trainingDto);
+  // }
+
+  async updateTraining(
+    id: number,
+    trainingDto: Partial<Training> & {
+      members?: { userId: number; role: string }[];
+    }
+  ) {
+    const { members = [], ...trainingData } = trainingDto;
+
+    const updatedTraining = await this.trainingRepository.updateTraining(
+      id,
+      trainingData
+    );
+
+    const existingTraining = await this.trainingRepository.findOneById(id);
+
+    const membersToRemove = existingTraining.members
+      .filter((member) => member.role !== "admin")
+      .map((member) => ({
+        userId: member.user.id,
+        role: member.role,
+      }));
+
+    if (membersToRemove.length > 0) {
+      await this.trainingRepository.removeMembers(id, membersToRemove);
+    }
+
+    if (members.length > 0) {
+      await this.trainingRepository.addMembers(id, members);
+    }
+
+    return updatedTraining;
   }
 
   async deleteTraining(id: number) {
@@ -44,13 +76,12 @@ export default class TrainingService {
   }
 
   removeMembers(
-  trainingId: number,
-  members: { userId: number; role: string }[]
-) {
-  return this.trainingRepository.removeMembers(trainingId, members);
-}
-async getProgramsByUserId(userId: number) {
-  return this.trainingRepository.findProgramsByUserId(userId);
-}
-
+    trainingId: number,
+    members: { userId: number; role: string }[]
+  ) {
+    return this.trainingRepository.removeMembers(trainingId, members);
+  }
+  async getProgramsByUserId(userId: number) {
+    return this.trainingRepository.findProgramsByUserId(userId);
+  }
 }
