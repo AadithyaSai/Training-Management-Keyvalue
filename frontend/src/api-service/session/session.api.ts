@@ -1,3 +1,4 @@
+import { add } from "date-fns";
 import baseApi, { ApiTagType } from "../baseApi";
 
 export const sessionApi = baseApi.injectEndpoints({
@@ -47,6 +48,14 @@ export const sessionApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: [ApiTagType.TRAINING, ApiTagType.SESSION],
     }),
+    addMembersToSession: builder.mutation({
+      query: (payload) => ({
+        url: `/session/${payload.id}/roles`,
+        method: "POST",
+        body: { users: payload.members },
+      }),
+      invalidatesTags: [ApiTagType.SESSION],
+    }),
   }),
 });
 
@@ -57,4 +66,5 @@ export const {
   useUpdateSessionMutation,
   useDeleteSessionMutation,
   useUpdateMultipleSessionsMutation,
+  useAddMembersToSessionMutation,
 } = sessionApi;
