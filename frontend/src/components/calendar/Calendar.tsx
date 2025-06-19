@@ -3,7 +3,7 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 import { useDrag, useDrop, DndProvider } from "react-dnd";
 import dayjs from "dayjs";
 import { useGetTrainingByIdQuery } from "../../api-service/training/training.api";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Layout from "../layout/Layout";
 import Button, { ButtonType } from "../button/Button";
 import { useUpdateMultipleSessionsMutation } from "../../api-service/session/session.api";
@@ -41,7 +41,7 @@ const DraggableSession = ({
   const [{ isDragging }, drag] = useDrag(() => ({
     type: "SESSION",
     item: { ...session, fromCalendar, calendarIndex: index, dateKey },
-    canDrag: session.status.toLowerCase() === "draft",
+    canDrag: session.status.toLowerCase() === "draft" || !fromCalendar,
     collect: (monitor) => ({
       isDragging: !!monitor.isDragging(),
     }),
@@ -51,7 +51,7 @@ const DraggableSession = ({
     return (
       <div
         ref={drag}
-        className={`${session.color} text-white text-lg px-2 py-1 rounded mb-2 cursor-move shadow overflow-hidden ${className}`}
+        className={`bg-blue-400 text-white text-lg px-2 py-1 rounded mb-2 cursor-move shadow overflow-hidden ${className} hover:scale-101 transition-transform`}
         style={{ opacity: isDragging ? 0.5 : 1 }}
       >
         {session.title}
@@ -68,14 +68,18 @@ const DraggableSession = ({
   return (
     <div
       ref={drag}
-      className={`${session.color} text-white px-2 py-1 rounded mb-2 cursor-move shadow overflow-hidden flex justify-between items-center ${className}`}
+      className={`${
+        session.status === "Draft" ? "bg-white/60" : "bg-green-500"
+      } text-white px-2 py-1 rounded mb-2 cursor-move shadow overflow-hidden flex justify-between items-center ${className}`}
       style={{ opacity: isDragging ? 0.5 : 1 }}
     >
-      <div>{session.title}</div>
+      <div className="text-nowrap overflow-hidden overflow-ellipsis w-4/5">
+        {session.title}
+      </div>
       {fromCalendar && (
         <button
           onClick={onRemove}
-          className="ml-2 bg-white text-black rounded-full w-5 h-5 text-sm flex items-center justify-center"
+          className="ml-2 bg-white text-black rounded-full w-5 h-5 text-sm flex items-center justify-center cursor-pointer hover:bg-gray-200"
         >
           ×
         </button>
@@ -183,35 +187,59 @@ const DroppablePool = ({
 // 📆 Main Calendar Component
 const Calendar = () => {
   const [currentMonth, setCurrentMonth] = useState(dayjs("2025-06-01"));
-  const [calendarItems, setCalendarItems] = useState<{ [key: string]: any[] }>(
-    () => {
-      const saved = localStorage.getItem("calendarItems");
-      return saved ? JSON.parse(saved) : {};
-    }
-  );
+  const [calendarItems, setCalendarItems] = useState<{
+    [key: string]: any[];
+  }>({});
   const { trainingId } = useParams();
-  const { data: trainingDetails, isLoading } = useGetTrainingByIdQuery({
+  const {
+    data: trainingDetails,
+    isLoading: isGetTrainingLoading,
+    isFetching: isGetTrainingFetching,
+  } = useGetTrainingByIdQuery({
     id: parseInt(trainingId || "0", 10),
   });
 
-  const [updateMultipleSessions] = useUpdateMultipleSessionsMutation();
+  const [updateMultipleSessions, { isLoading: updateIsLoading }] =
+    useUpdateMultipleSessionsMutation();
+
+  const navigate = useNavigate();
+
+  // useEffect(() => {
+  //   console.log("Updated calendar items:", calendarItems);
+  // }, [calendarItems]);
+
+  const coloredSessions = useMemo(() => {
+    if (!trainingDetails?.sessions) return [];
+    return trainingDetails.sessions.map((session: any, index: number) => ({
+      ...session,
+    }));
+  }, [trainingDetails?.sessions]);
 
   useEffect(() => {
-    localStorage.setItem("calendarItems", JSON.stringify(calendarItems));
-    console.log("Updated calendar items:", calendarItems);
-  }, [calendarItems]);
+    // Initialize calendar items from GET
+    if (!coloredSessions) return;
+    const initialItems: { [key: string]: any[] } = {};
+    coloredSessions.forEach((session: any) => {
+      const dateKey = session.date
+        ? dayjs(session.date).format("YYYY-MM-DD")
+        : "";
+      if (!dateKey || session.status === "Draft") return;
 
-  const coloredSessions = (trainingDetails?.sessions || []).map(
-    (session: any, idx: number) => ({
-      ...session,
-      color:
-        session.status !== "Draft"
-          ? "bg-gray-500"
-          : colorClasses[idx % colorClasses.length],
-    })
-  );
+      if (!initialItems[dateKey]) {
+        initialItems[dateKey] = [];
+      }
+      initialItems[dateKey].push({
+        ...session,
+        fromCalendar: false, // Initially not from calendar
+        dateKey,
+      });
+    });
+    setCalendarItems(initialItems);
+    console.log("Initialized calendar items:", initialItems);
+  }, [coloredSessions]);
 
   const sessionsRemaining = useMemo(() => {
+    if (!coloredSessions) return [];
     const scheduledIds = new Set<number>();
 
     Object.values(calendarItems).forEach((sessions: any[]) => {
@@ -258,7 +286,10 @@ const Calendar = () => {
 
       // From pool to calendar
       if (!session.fromCalendar) {
-        return { ...prev, [key]: [...existing, { ...session }] };
+        return {
+          ...prev,
+          [key]: [...existing, { ...session, status: "Draft" }],
+        };
       }
 
       return prev;
@@ -324,12 +355,22 @@ const Calendar = () => {
             programId: parseInt(trainingId!, 10),
             date: dateKey,
             slot: idx + 1,
+            status: "Scheduled",
           }))
         )
         .flat(),
     ];
+    //add sessions not in calendarItems to payload as scheduled
+    payload.push(
+      ...sessionsRemaining.map((session: any) => ({
+        id: session.id,
+        programId: parseInt(trainingId!, 10),
+        slot: 1,
+        status: "Draft",
+      }))
+    );
     updateMultipleSessions({
-      sessions: payload.map((s) => ({ ...s, status: "Scheduled" })),
+      sessions: payload.map((s) => ({ ...s })),
     })
       .unwrap()
       .then((x) => {
@@ -340,10 +381,13 @@ const Calendar = () => {
       });
   };
 
-  if (isLoading) return <></>;
-
   return (
-    <Layout title={`${trainingDetails?.title} - Calendar`}>
+    <Layout
+      title={`${trainingDetails?.title} - Calendar`}
+      isLoading={
+        isGetTrainingLoading || isGetTrainingFetching || updateIsLoading
+      }
+    >
       <DndProvider backend={HTML5Backend}>
         <div className="flex p-4 bg-bgColor font-sans">
           {/* 📅 Calendar Section */}
@@ -387,12 +431,20 @@ const Calendar = () => {
                   ))}
                 </DroppablePool>
               </div>
-              <Button
-                variant={ButtonType.PRIMARY}
-                onClick={handleConfirmSchedule}
-              >
-                Confirm Schedule
-              </Button>
+              <div className="flex flex-col gap-2">
+                <Button
+                  variant={ButtonType.PRIMARY}
+                  onClick={handleConfirmSchedule}
+                >
+                  Confirm Schedule
+                </Button>
+                <Button
+                  variant={ButtonType.SECONDARY}
+                  onClick={() => navigate(-1)}
+                >
+                  Back
+                </Button>
+              </div>
             </div>
           </div>
         </div>
