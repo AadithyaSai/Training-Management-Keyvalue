@@ -184,10 +184,7 @@ const DroppablePool = ({
 const Calendar = () => {
   const [currentMonth, setCurrentMonth] = useState(dayjs("2025-06-01"));
   const [calendarItems, setCalendarItems] = useState<{ [key: string]: any[] }>(
-    () => {
-      const saved = localStorage.getItem("calendarItems");
-      return saved ? JSON.parse(saved) : {};
-    }
+    {}
   );
   const { trainingId } = useParams();
   const { data: trainingDetails, isLoading } = useGetTrainingByIdQuery({
@@ -200,6 +197,28 @@ const Calendar = () => {
     localStorage.setItem("calendarItems", JSON.stringify(calendarItems));
     console.log("Updated calendar items:", calendarItems);
   }, [calendarItems]);
+
+  useEffect(() => {
+    if (trainingDetails?.sessions) {
+      const initialItems: { [key: string]: any[] } = {};
+      trainingDetails.sessions.forEach((session: any) => {
+        const dateKey = dayjs(session.date).format("YYYY-MM-DD");
+        if (!initialItems[dateKey]) {
+          initialItems[dateKey] = [];
+        }
+        initialItems[dateKey].push({
+          ...session,
+          color:
+            session.status !== "Draft"
+              ? "bg-gray-500"
+              : colorClasses[
+                  (initialItems[dateKey].length || 0) % colorClasses.length
+                ],
+        });
+      });
+      setCalendarItems(initialItems);
+    }
+  }, [trainingDetails]);
 
   const coloredSessions = (trainingDetails?.sessions || []).map(
     (session: any, idx: number) => ({

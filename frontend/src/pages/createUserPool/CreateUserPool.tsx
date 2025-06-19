@@ -39,13 +39,17 @@ const AddUserModal = ({
   const { data: userList } = useGetUserListQuery({});
   const toggleUser = (user: User) => {
     setTempSelection((prev) =>
-      prev.includes(user)
-        ? prev.filter((t) => t.id !== user.id)
+      prev.some((u) => u.id === user.id)
+        ? prev.filter((u) => u.id !== user.id)
         : [...prev, user]
     );
   };
+
+  useEffect(() => {
+    console.log("Temp selection updated:", tempSelection);
+  }, [tempSelection]);
   const handleAddUsers = () => {
-    onSelect((prev) => Array.from(new Set([...prev, ...tempSelection])));
+    onSelect((prev) => Array.from(new Set([...tempSelection])));
     setTempSelection([]);
     showModal(false);
   };

@@ -30,13 +30,13 @@ const UpdateTraining = () => {
     }));
     members.push(
       ...moderatorPool.map((member) => ({
-        userId: member.userId,
+        userId: member.id,
         role: UserRoleType.MODERATOR,
       }))
     );
     members.push(
       ...candidatePool.map((member) => ({
-        userId: member.userId,
+        userId: member.id,
         role: UserRoleType.CANDIDATE,
       }))
     );
@@ -44,10 +44,6 @@ const UpdateTraining = () => {
       id: trainingId,
       data: {
         ...trainingDetails,
-        members: members.map((t) => ({
-          userId: t.userId,
-          role: t.role.toLowerCase(),
-        })),
       },
     })
       .unwrap()
@@ -85,16 +81,18 @@ const UpdateTraining = () => {
 
   useEffect(() => {
     if (!trainingDetailsData) return;
+    console.log(trainingDetailsData);
     setTrainingDetails({
       title: trainingDetailsData.title,
       description: trainingDetailsData.description,
       startDate: trainingDetailsData.startDate,
       endDate: trainingDetailsData.endDate,
       members: trainingDetailsData.members.map((member) => ({
-        userId: member.user.id,
+        userId: member.user?.id,
         role: member.role.toLowerCase(),
       })),
     });
+    console.log(trainingDetailsData.members);
     if (trainingDetailsData.members) {
       setTrainerPool(
         trainingDetailsData.members

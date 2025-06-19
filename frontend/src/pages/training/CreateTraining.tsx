@@ -42,10 +42,32 @@ const CreateTraining = () => {
   const [createTraining, { isLoading }] = useCreateTrainingMutation();
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    createTraining(trainingDetails)
+    const members = trainerPool.map((member) => ({
+      userId: member.id,
+      role: UserRoleType.TRAINER as string,
+    }));
+    members.push(
+      ...moderatorPool.map((member) => ({
+        userId: member.id,
+        role: UserRoleType.MODERATOR,
+      }))
+    );
+    members.push(
+      ...candidatePool.map((member) => ({
+        userId: member.id,
+        role: UserRoleType.CANDIDATE,
+      }))
+    );
+    createTraining({
+      ...trainingDetails,
+      members: members.map((t) => ({
+        userId: t.userId || t.id,
+        role: t.role.toLowerCase(),
+      })),
+    })
       .unwrap()
       .then(() => {
-        navigate("/adminDashboard");
+        navigate("/dashboard");
       })
       .catch((error) => {
         console.log(error);
