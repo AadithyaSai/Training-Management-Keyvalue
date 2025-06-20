@@ -36,25 +36,25 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
 
     const handleSubmit = () => {
         const isCandidate: boolean = userRole == UserRoleType.CANDIDATE;
-        
-        createFeedback({
+        const feedbackData = {
             comments: feedback,
             rating: rating * 2, // Mapping 1-5 stars to a rating (0-10)
-            fromId: userId,
-            toId: (isCandidate ? candidate?.id : trainerId) || 0,
+            fromId: Number(userId),
+            toId: Number((isCandidate ? trainerId : candidate?.id) || 0),
             sessionId: sessionId,
             type:
                 isCandidate
                     ? "aboutTrainer"
                     : "aboutCandidate",
-        })
+        }
+        createFeedback(feedbackData)
             .unwrap()
             .then((data) => {
                 console.log(data);
             })
             .catch((error) => console.log(error));
 
-        console.log("Feedback submitted:", { rating, feedback });
+        console.log("Feedback submitted:", feedbackData);
         onClose();
     };
 

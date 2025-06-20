@@ -2,12 +2,14 @@ import { PacmanLoader } from "react-spinners";
 import Header from "../header/Header";
 import Navbar from "../navbar/Navbar";
 import { ToastContainer } from "react-toastify";
+import type { UserRole } from "../../pages/session/components/sessionTypes";
 
 interface LayoutProps {
     title?: string;
     children?: React.ReactNode;
     endAdornments?: React.ReactNode;
     isLoading?: boolean;
+    userRole?: UserRole;
 }
 
 const LightEffect = () => {
@@ -29,12 +31,13 @@ const Layout: React.FC<LayoutProps> = ({
     children,
     endAdornments,
     isLoading,
+    userRole,
 }) => {
     return (
         <div className="flex flex-col min-h-screen bg-bgColor">
             <ToastContainer toastClassName="custom-toast" />
             <Header title={title} endAdornments={endAdornments} />
-            <Navbar />
+            <Navbar userRole={userRole}/>
             <div className="flex mt-headerHeight">
                 <div className="w-full h-bodyHeight relative ml-navbarWidth">
                     <LightEffect />

@@ -12,6 +12,7 @@ export const PoolUserRole = {
   CANDIDATE: "Candidate",
 } as const;
 interface CreateUserPoolProps {
+  // role: (typeof PoolUserRole)[keyof typeof PoolUserRole];
   role: (typeof PoolUserRole)[keyof typeof PoolUserRole];
   pool?: UserPoolData[];
   setPool: Dispatch<SetStateAction<UserPoolData[]>>;
@@ -39,13 +40,17 @@ const AddUserModal = ({
   const { data: userList } = useGetUserListQuery({});
   const toggleUser = (user: User) => {
     setTempSelection((prev) =>
-      prev.includes(user)
-        ? prev.filter((t) => t.id !== user.id)
+      prev.some((u) => u.id === user.id)
+        ? prev.filter((u) => u.id !== user.id)
         : [...prev, user]
     );
   };
+
+  useEffect(() => {
+    console.log("Temp selection updated:", tempSelection);
+  }, [tempSelection]);
   const handleAddUsers = () => {
-    onSelect((prev) => Array.from(new Set([...prev, ...tempSelection])));
+    onSelect((prev) => Array.from(new Set([...tempSelection])));
     setTempSelection([]);
     showModal(false);
   };
@@ -185,7 +190,7 @@ const CreateUserPool: React.FC<CreateUserPoolProps> = ({
               setPoolType(null);
             }}
           >
-            Back
+            Save {role} Pool
           </Button>
         </div>
         {showModal && (

@@ -24,6 +24,8 @@ const SessionDetails = () => {
         trainer: { id: 0, name: "" },
         moderators: [],
         materials: [],
+        materialQualityFeedback: "",
+        sessionFeedback: "",
     });
 
     const { trainingId, sessionId } = useParams();
@@ -33,7 +35,9 @@ const SessionDetails = () => {
     });
 
     const [deleteSession, { isLoading }] = useDeleteSessionMutation();
-    const { data: feedbackList } = useGetFeedbacksBySessionIdQuery({ sessionId });
+    const { data: feedbackList } = useGetFeedbacksBySessionIdQuery({
+        sessionId,
+    });
 
     useEffect(() => {
         if (!sessionDetailsData) return;
@@ -46,18 +50,24 @@ const SessionDetails = () => {
             }) => ({
                 id: userSession.id,
                 role: userSession.role,
-                name: userSession.user.name
+                name: userSession.user.name,
             })
         );
 
-        const trainer = userDetails.filter((user: { role: UserRole }) => (user.role === UserRoleType.TRAINER))[0];
-        const moderators = userDetails.filter((user: { role: UserRole }) => (user.role === UserRoleType.MODERATOR));
+        const trainer = userDetails.filter(
+            (user: { role: UserRole }) => user.role === UserRoleType.TRAINER
+        )[0];
+        const moderators = userDetails.filter(
+            (user: { role: UserRole }) => user.role === UserRoleType.MODERATOR
+        );
 
         setSessionDetails({
             description: sessionDetailsData.description,
             materials: [...(sessionDetailsData.materials || [])],
             trainer,
-            moderators: [...moderators]
+            moderators: [...moderators],
+            materialQualityFeedback: sessionDetailsData.materialQualityFeedback,
+            sessionFeedback: sessionDetailsData.sessionFeedback
         });
     }, [sessionDetailsData]);
 
@@ -69,10 +79,11 @@ const SessionDetails = () => {
         sessionId,
     });
 
-    console.log(userRole)
+    console.log(userRole);
 
     return (
         <Layout
+            userRole={userRole}
             title={sessionDetailsData?.title || "Session Title"}
             isLoading={isLoading || !sessionDetailsData}
             endAdornments={
@@ -100,19 +111,24 @@ const SessionDetails = () => {
             <div className="min-h-screen w-full relative text-white">
                 <div className="flex flex-col gap-5">
                     <div className="border border-borderColor bg-cardColor w-full rounded-lg p-6 space-y-6">
-                        <SessionContent sessionData={sessionDetails} />
+                        <SessionContent
+                            isAdmin={isAdmin}
+                            sessionData={sessionDetails}
+                        />
 
                         {/* Action Buttons */}
                         <div className="pt-4">
                             <SessionActionButtons
-                                trainerId={sessionDetails.trainer?.id || 0}
+                                isAdmin={isAdmin}
+                                trainerId={sessionDetails.trainer?.id}
                                 sessionId={Number(sessionId)}
                                 userRole={userRole}
                                 uploadMaterials={
-                                    userRole === UserRoleType.TRAINER
+                                    isAdmin || userRole === UserRoleType.TRAINER
                                 }
                                 giveFeedback={true}
                                 uploadAssignment={
+                                    isAdmin ||
                                     userRole === UserRoleType.CANDIDATE
                                 }
                             />

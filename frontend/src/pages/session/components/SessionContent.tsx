@@ -1,10 +1,12 @@
 import type { SessionData } from "./sessionTypes";
 
 interface SessionContentProps {
+    isAdmin?: boolean;
     sessionData: SessionData;
 }
 
 export const SessionContent: React.FC<SessionContentProps> = ({
+    isAdmin = false,
     sessionData,
 }) => {
     return (
@@ -39,8 +41,33 @@ export const SessionContent: React.FC<SessionContentProps> = ({
                 </p>
             </div>
 
+            {isAdmin && (
+                <>
+                    {sessionData.materialQualityFeedback && (
+                        <div className="border-b border-gray-600 pb-4">
+                            <h3 className="text-gray-400 text-sm mb-2">
+                                Material Quality
+                            </h3>
+                            <p className="text-gray-300 leading-relaxed">
+                                {sessionData.materialQualityFeedback}
+                            </p>
+                        </div>
+                    )}
+                    {sessionData.sessionFeedback && (
+                        <div className="border-b border-gray-600 pb-4">
+                            <h3 className="text-gray-400 text-sm mb-2">
+                                Summary of feedbacks
+                            </h3>
+                            <p className="text-gray-300 leading-relaxed">
+                                {sessionData.sessionFeedback}
+                            </p>
+                        </div>
+                    )}
+                </>
+            )}
+
             {/* Uploaded Materials (for all roles) */}
-            {sessionData.materials && (
+            {/* {sessionData.materials && (
                 <div className="border-b border-gray-600 pb-4">
                     <h3 className="text-gray-400 text-sm mb-2">
                         Uploaded Materials
@@ -60,7 +87,7 @@ export const SessionContent: React.FC<SessionContentProps> = ({
                         ))}
                     </div>
                 </div>
-            )}
+            )} */}
         </>
     );
 };

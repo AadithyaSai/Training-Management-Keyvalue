@@ -59,7 +59,7 @@ const LoginFormSection: React.FC<LoginFormSectionProps> = ({
 const LoginFormSlider = () => {
     const [sliderPosition, setSliderPosition] =
         useState<SliderPosition>("left");
-    const formText = sliderPosition == "left" ? "Welcome text" : "Welcome back";
+    const formText = sliderPosition == "left" ? "Welcome back" : "Welcome text";
     const buttonText = sliderPosition == "left" ? "Signup" : "Signin";
     const toggleSlider = () => {
         sliderPosition == "left"
@@ -114,7 +114,7 @@ const LoginForm = () => {
                 const isAdmin = decoded.isAdmin; 
 
                 if (isAdmin) {
-                    navigate("/adminDashboard");
+                    navigate(`/adminDashboard/${decoded.id}`);
                 } else {
                     navigate(`/dashboard/${decoded.id}`);
                 }

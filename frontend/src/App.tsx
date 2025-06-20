@@ -22,7 +22,7 @@ const router = createBrowserRouter([
         errorElement: <NotFound />,
     },
     {
-        path: "/adminDashboard",
+        path: "/adminDashboard/:userId",
         element: <AdminDashboard />,
         errorElement: <NotFound />,
     },
