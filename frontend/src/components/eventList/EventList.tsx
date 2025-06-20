@@ -132,7 +132,7 @@ const EventList: React.FC<EventListProps> = ({
     data,
 }) => {
     const [statusFilter, setStatusFilter] = useState(
-        String(EventStatusType.IN_PROGRESS)
+        String(EventStatusType.DEFAULT)
     );
     const [searchTerm, setSearchTerm] = useState("");
     if (!data) return <></>;

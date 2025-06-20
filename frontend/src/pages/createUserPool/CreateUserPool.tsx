@@ -190,7 +190,7 @@ const CreateUserPool: React.FC<CreateUserPoolProps> = ({
               setPoolType(null);
             }}
           >
-            Back
+            Save {role} Pool
           </Button>
         </div>
         {showModal && (

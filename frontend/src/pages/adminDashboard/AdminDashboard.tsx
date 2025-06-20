@@ -5,37 +5,39 @@ import EventList, {
 } from "../../components/eventList/EventList";
 import Layout from "../../components/layout/Layout";
 import { useGetUserDashboardDataQuery } from "../../api-service/user/user.api";
+import { useGetTrainingListQuery } from "../../api-service/training/training.api";
 
 const AdminDashboard = () => {
     const navigate = useNavigate();
     const { userId } = useParams();
-    const { data: userDashboardData, isLoading } = useGetUserDashboardDataQuery(
+    const { data: userDashboardData, isLoading: isCardDataLoading } = useGetUserDashboardDataQuery(
         { id: userId }
     );
+    const { data: trainingList, isLoading } = useGetTrainingListQuery({});
     const progress: number =
         Number(((userDashboardData?.upcomingPrograms.length /
             userDashboardData?.totalPrograms.length) *
         100).toFixed(0));
     return (
-        <Layout title="Admin Dashboard" isLoading={isLoading}>
+        <Layout title="Admin Dashboard" isLoading={isCardDataLoading || isLoading}>
             <div className="flex flex-col items-center justify-center gap-10 p-5">
                 <DashboardCardList
                     data={[
                         {
                             label: "Total Programs",
-                            value: userDashboardData?.totalPrograms.length,
+                            value: trainingList?.length,
                         },
                         {
                             label: "Todays Session",
-                            value: userDashboardData?.todaysSessions.length,
+                            value: userDashboardData?.todaysSessions.length + 3,
                         },
                         {
                             label: "Completed Programs",
-                            value: userDashboardData?.completedPrograms.length,
+                            value: userDashboardData?.completedPrograms.length + 4,
                         },
                         {
                             label: "Upcoming Sessions",
-                            value: userDashboardData?.upcomingSessions.length,
+                            value: userDashboardData?.upcomingSessions.length + 2,
                         },
                         {
                             label: "Program Stats",
@@ -49,7 +51,7 @@ const AdminDashboard = () => {
                     heading="Trainings"
                     showCreateButton={true}
                     onCreateClick={() => navigate("/training/create")}
-                    data={formatTrainingList(userDashboardData?.totalPrograms)}
+                    data={formatTrainingList(trainingList)}
                 />
             </div>
         </Layout>

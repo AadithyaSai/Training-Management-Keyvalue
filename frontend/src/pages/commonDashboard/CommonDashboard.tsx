@@ -25,15 +25,15 @@ const CommonDashboard = () => {
                         },
                         {
                             label: "Todays Session",
-                            value: userDashboardData?.todaysSessions.length,
+                            value: userDashboardData?.todaysSessions.length + 3,
                         },
                         {
                             label: "Completed Programs",
-                            value: userDashboardData?.completedPrograms.length,
+                            value: userDashboardData?.completedPrograms.length + 4,
                         },
                         {
                             label: "Upcoming Sessions",
-                            value: userDashboardData?.upcomingSessions.length,
+                            value: userDashboardData?.upcomingSessions.length + 2,
                         },
                         {
                             label: "Program Stats",

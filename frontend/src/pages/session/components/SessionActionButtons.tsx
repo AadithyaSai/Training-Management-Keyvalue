@@ -5,8 +5,13 @@ import { UploadMaterialsModal } from "./modals/UploadMaterialsModal";
 import { FeedbackModal } from "./modals/FeedbackModal";
 import { CandidateListModal } from "./modals/CandidateListModal";
 import { UploadAssignmentsModal } from "./modals/UploadAssignmentsModal";
+import { useGetSessionByIdQuery } from "../../../api-service/session/session.api";
+import MaterialsModal from "./modals/ViewMaterialModal";
+import ViewAssignmentsModal from "./modals/ViewAssignmentModal";
+import { useGetAssignmentListQuery } from "../../../api-service/assignment/viewAssignment.api";
 
 interface SessionActionButtonsProps {
+    isAdmin?: boolean;
     userRole: UserRole;
     sessionId: number;
     trainerId?: number;
@@ -16,6 +21,7 @@ interface SessionActionButtonsProps {
 }
 
 export const SessionActionButtons: React.FC<SessionActionButtonsProps> = ({
+    isAdmin = false,
     userRole,
     sessionId,
     trainerId,
@@ -26,6 +32,12 @@ export const SessionActionButtons: React.FC<SessionActionButtonsProps> = ({
     const [uploadModalOpen, setUploadModalOpen] = useState(false);
     const [feedbackModalOpen, setFeedbackModalOpen] = useState(false);
     const [candidateListModalOpen, setCandidateListModalOpen] = useState(false);
+    const [viewMaterialModalOpen, setViewMaterialModalOpen] = useState(false);
+    const [viewAssignmentModalOpen, setViewAssignmentModalOpen] = useState(false);
+    const { data: sessionDetailsData } = useGetSessionByIdQuery({
+        id: sessionId,
+    });
+    const { data: assignmentList } = useGetAssignmentListQuery({});
 
     const handleUploadAssignment = () => {
         setUploadModalOpen(true);
@@ -41,6 +53,14 @@ export const SessionActionButtons: React.FC<SessionActionButtonsProps> = ({
 
     const handleUploadMaterials = () => {
         setUploadModalOpen(true);
+    };
+
+    const handleViewMaterials = () => {
+        setViewMaterialModalOpen(true);
+    };
+
+    const handleViewAssignments = () => {
+        setViewAssignmentModalOpen(true);
     };
 
     return (
@@ -93,6 +113,38 @@ export const SessionActionButtons: React.FC<SessionActionButtonsProps> = ({
                     <UploadMaterialsModal
                         isOpen={uploadModalOpen}
                         onClose={() => setUploadModalOpen(false)}
+                    />
+                </>
+            )}
+            {
+                <>
+                    <Button
+                        onClick={handleViewMaterials}
+                        variant={ButtonType.SECONDARY}
+                    >
+                        View Materials
+                    </Button>
+                    <MaterialsModal
+                        isOpen={viewMaterialModalOpen}
+                        onClose={() => setViewMaterialModalOpen(false)}
+                        materials={sessionDetailsData?.materials}
+                    />
+                </>
+            }
+            {(isAdmin ||
+                userRole == UserRoleType.TRAINER ||
+                userRole == UserRoleType.MODERATOR) && (
+                <>
+                    <Button
+                        onClick={handleViewAssignments}
+                        variant={ButtonType.SECONDARY}
+                    >
+                        View Assignments
+                    </Button>
+                    <ViewAssignmentsModal
+                        isOpen={viewAssignmentModalOpen}
+                        onClose={() => setViewAssignmentModalOpen(false)}
+                        assignments={assignmentList || []}
                     />
                 </>
             )}
