@@ -261,6 +261,7 @@ export class SessionService {
 				role: role as Role,
 			};
 		});
+		//add check
 		const result = await this.userSessionRepository.addUsersToSession(
 			session_id,
 			users
