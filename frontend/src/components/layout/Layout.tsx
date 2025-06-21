@@ -37,14 +37,14 @@ const Layout: React.FC<LayoutProps> = ({
         <div className="flex flex-col min-h-screen bg-bgColor">
             <ToastContainer toastClassName="custom-toast" />
             <Header title={title} endAdornments={endAdornments} />
-            <Navbar userRole={userRole}/>
-            <div className="flex mt-headerHeight">
-                <div className="w-full h-bodyHeight relative ml-navbarWidth">
+            <Navbar userRole={userRole} />
+            <div className="flex mt-headerHeight h-bodyHeight">
+                <div className="w-full relative ml-navbarWidth">
                     <LightEffect />
                     <main className="p-6 overflow-y-auto w-full h-full relative z-10">
                         {isLoading ? (
                             <div className="flex items-center justify-center w-full h-full">
-                                <PacmanLoader color="#fff" size={30}/>
+                                <PacmanLoader color="#fff" size={30} />
                             </div>
                         ) : (
                             children
@@ -52,7 +52,6 @@ const Layout: React.FC<LayoutProps> = ({
                     </main>
                 </div>
             </div>
-            {/* <Popup isOpen={true} popup={popup} /> */}
         </div>
     );
 };

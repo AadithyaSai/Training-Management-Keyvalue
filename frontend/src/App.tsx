@@ -1,23 +1,22 @@
+import { Provider } from "react-redux";
 import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
+import store from "./store/store";
+
+import Login from "./pages/login/Login";
 import AdminDashboard from "./pages/adminDashboard/AdminDashboard";
+import CommonDashboard from "./pages/commonDashboard/CommonDashboard";
+import TrainingDetails from "./pages/training/TrainingDetails";
 import CreateTraining from "./pages/training/CreateTraining";
 import UpdateTraining from "./pages/training/UpdateTraining";
-import Login from "./pages/login/Login";
-import TrainingDetails from "./pages/training/TrainingDetails";
-import NotFound from "./components/error/notFound/NoutFound";
-
-import CreateSession from "./pages/session/CreateSession";
-
-import SessionDetails from "./pages/session/SessionDetails";
-import { Provider } from "react-redux";
-import store from "./store/store";
-import UpdateSession from "./pages/session/UpdateSession";
-import CommonDashboard from "./pages/commonDashboard/CommonDashboard";
 import Calendar from "./components/calendar/Calendar";
+import SessionDetails from "./pages/session/SessionDetails";
+import CreateSession from "./pages/session/CreateSession";
+import UpdateSession from "./pages/session/UpdateSession";
+import NotFound from "./components/error/notFound/NoutFound";
 
 const router = createBrowserRouter([
     {
-        path: "/",
+        path: "/login",
         element: <Login />,
         errorElement: <NotFound />,
     },
@@ -36,53 +35,60 @@ const router = createBrowserRouter([
         element: <Outlet />,
         children: [
             {
-                index: true,
-                element: <NotFound />,
-            },
-            {
                 path: "create",
                 element: <CreateTraining />,
             },
 
             {
                 path: ":trainingId",
-                element: <TrainingDetails />,
-            },
-            {
-                path: ":trainingId/update",
-                element: <UpdateTraining />,
-            },
-            {
-                path: ":trainingId/calendar",
-                element: <Calendar />,
-            },
-            {
-                path: ":trainingId/session",
                 element: <Outlet />,
                 children: [
                     {
                         index: true,
-                        element: <NotFound />,
+                        element: <TrainingDetails />,
                     },
                     {
-                        path: "create",
-                        element: <CreateSession />,
+                        path: "update",
+                        element: <UpdateTraining />,
                     },
                     {
-                        path: ":sessionId",
-                        element: <SessionDetails />,
+                        path: "calendar",
+                        element: <Calendar />,
                     },
                     {
-                        path: ":sessionId/update",
-                        element: <UpdateSession />,
+                        path: "session",
+                        element: <Outlet />,
+                        children: [
+                            {
+                                index: true,
+                                element: <NotFound />,
+                            },
+                            {
+                                path: "create",
+                                element: <CreateSession />,
+                            },
+                            {
+                                path: ":sessionId",
+                                element: <Outlet />,
+                                children: [
+                                    {
+                                        index: true,
+                                        element: <SessionDetails />,
+                                    },
+                                    {
+                                        path: "update",
+                                        element: <UpdateSession />,
+                                    },
+                                ],
+                            },
+                        ],
+                        errorElement: <NotFound />,
                     },
                 ],
-                errorElement: <NotFound />,
             },
         ],
         errorElement: <NotFound />,
     },
-
     {
         path: "*",
         element: <NotFound />,

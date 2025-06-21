@@ -29,8 +29,3 @@ export interface SessionData {
     materialQualityFeedback?: string;
     sessionFeedback?: string;
 }
-
-// export interface SessionPageProps {
-//   userRole: UserRole;
-//   sessionData: SessionData;
-// }

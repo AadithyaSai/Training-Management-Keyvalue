@@ -48,14 +48,14 @@ const Navbar: React.FC<NavbarProps> = ({ userRole }) => {
 
     return (
         <nav className="fixed top-headerHeight left-0 bottom-0 w-navbarWidth bg-cardColor text-white shadow-bgColor shadow-xl py-6 z-40 border-t-transparent flex flex-col">
-            <div className="px-4 mb-4">
+            <div className="px-5 py-1 mb-4">
                 <div className="w-full flex gap-4 items-center p-3 rounded-md">
                     <span className="size-12 rounded-full bg-gray-200 text-black text-xl overflow-clip flex items-center justify-center">
                         U
                     </span>
                     <div className="flex flex-col">
                         <span className="text-white text-xl">Username</span>
-                        <p className="text-white text-sm">
+                        <p className="text-green-500 text-sm font-bold">
                             {isAdmin
                                 ? "ADMIN"
                                 : userRole &&

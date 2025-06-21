@@ -1,28 +1,27 @@
 import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
+import {
+    useDeleteSessionMutation,
+    useGetSessionByIdQuery,
+} from "../../api-service/session/session.api";
+import { useGetUserRoleInSessionQuery } from "../../api-service/user/user.api";
+import { useGetFeedbacksBySessionIdQuery } from "../../api-service/feedback/feedback.api";
+import Layout from "../../components/layout/Layout";
 import { SessionContent } from "./components/SessionContent";
 import { SessionActionButtons } from "./components/SessionActionButtons";
-
 import {
     type SessionData,
     type UserRole,
     UserRoleType,
 } from "./components/sessionTypes";
-import Layout from "../../components/layout/Layout";
-import { useNavigate, useParams } from "react-router-dom";
-import {
-    useDeleteSessionMutation,
-    useGetSessionByIdQuery,
-} from "../../api-service/session/session.api";
 import Button, { ButtonType } from "../../components/button/Button";
-import { jwtDecode } from "jwt-decode";
-import { useGetUserRoleInSessionQuery } from "../../api-service/user/user.api";
-import { useGetFeedbacksBySessionIdQuery } from "../../api-service/feedback/feedback.api";
 
 const SessionDetails = () => {
     const [sessionDetails, setSessionDetails] = useState<SessionData>({
-        description: "",
-        trainer: { id: 0, name: "" },
+        trainer: { id: 0, name: "Trainer of Session 1" },
         moderators: [],
+        description: "",
         materials: [],
         materialQualityFeedback: "",
         sessionFeedback: "",
@@ -62,12 +61,15 @@ const SessionDetails = () => {
         );
 
         setSessionDetails({
-            description: sessionDetailsData.description,
-            materials: [...(sessionDetailsData.materials || [])],
             trainer,
             moderators: [...moderators],
+            description: sessionDetailsData.description,
+            materials: [
+                ...(sessionDetails.materials || []),
+                ...(sessionDetailsData.materials || []),
+            ],
             materialQualityFeedback: sessionDetailsData.materialQualityFeedback,
-            sessionFeedback: sessionDetailsData.sessionFeedback
+            sessionFeedback: sessionDetailsData.sessionFeedback,
         });
     }, [sessionDetailsData]);
 
@@ -120,17 +122,9 @@ const SessionDetails = () => {
                         <div className="pt-4">
                             <SessionActionButtons
                                 isAdmin={isAdmin}
-                                trainerId={sessionDetails.trainer?.id}
+                                sessionDetails={sessionDetails}
                                 sessionId={Number(sessionId)}
                                 userRole={userRole}
-                                uploadMaterials={
-                                    isAdmin || userRole === UserRoleType.TRAINER
-                                }
-                                giveFeedback={true}
-                                uploadAssignment={
-                                    isAdmin ||
-                                    userRole === UserRoleType.CANDIDATE
-                                }
                             />
                         </div>
                     </div>

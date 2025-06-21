@@ -1,11 +1,10 @@
 import { useState } from "react";
 import Button, { ButtonType } from "../../../components/button/Button";
-import { UserRoleType, type UserRole } from "./sessionTypes";
+import { UserRoleType, type SessionData, type UserRole } from "./sessionTypes";
 import { UploadMaterialsModal } from "./modals/UploadMaterialsModal";
 import { FeedbackModal } from "./modals/FeedbackModal";
 import { CandidateListModal } from "./modals/CandidateListModal";
 import { UploadAssignmentsModal } from "./modals/UploadAssignmentsModal";
-import { useGetSessionByIdQuery } from "../../../api-service/session/session.api";
 import MaterialsModal from "./modals/ViewMaterialModal";
 import ViewAssignmentsModal from "./modals/ViewAssignmentModal";
 import { useGetAssignmentListQuery } from "../../../api-service/assignment/viewAssignment.api";
@@ -14,61 +13,37 @@ interface SessionActionButtonsProps {
     isAdmin?: boolean;
     userRole: UserRole;
     sessionId: number;
-    trainerId?: number;
-    uploadAssignment?: boolean;
-    giveFeedback?: boolean;
-    uploadMaterials?: boolean;
+    sessionDetails?: SessionData;
 }
 
 export const SessionActionButtons: React.FC<SessionActionButtonsProps> = ({
     isAdmin = false,
     userRole,
     sessionId,
-    trainerId,
-    uploadAssignment = false,
-    giveFeedback = false,
-    uploadMaterials = false,
+    sessionDetails,
 }) => {
-    const [uploadModalOpen, setUploadModalOpen] = useState(false);
+    const [uploadMaterialModalOpen, setUploadMaterialModalOpen] =
+        useState(false);
+    const [uploadAssignmentModalOpen, setUploadAssignmentModalOpen] =
+        useState(false);
     const [feedbackModalOpen, setFeedbackModalOpen] = useState(false);
     const [candidateListModalOpen, setCandidateListModalOpen] = useState(false);
     const [viewMaterialModalOpen, setViewMaterialModalOpen] = useState(false);
-    const [viewAssignmentModalOpen, setViewAssignmentModalOpen] = useState(false);
-    const { data: sessionDetailsData } = useGetSessionByIdQuery({
-        id: sessionId,
-    });
+    const [viewAssignmentModalOpen, setViewAssignmentModalOpen] =
+        useState(false);
+
     const { data: assignmentList } = useGetAssignmentListQuery({});
-
-    const handleUploadAssignment = () => {
-        setUploadModalOpen(true);
-    };
-
-    const handleGiveFeedback = () => {
-        if (userRole === UserRoleType.CANDIDATE) {
-            setFeedbackModalOpen(true);
-        } else {
-            setCandidateListModalOpen(true);
-        }
-    };
-
-    const handleUploadMaterials = () => {
-        setUploadModalOpen(true);
-    };
-
-    const handleViewMaterials = () => {
-        setViewMaterialModalOpen(true);
-    };
-
-    const handleViewAssignments = () => {
-        setViewAssignmentModalOpen(true);
-    };
 
     return (
         <div className="flex gap-4">
-            {giveFeedback && (
+            {
                 <>
                     <Button
-                        onClick={handleGiveFeedback}
+                        onClick={() =>
+                            userRole === UserRoleType.CANDIDATE
+                                ? setFeedbackModalOpen(true)
+                                : setCandidateListModalOpen(true)
+                        }
                         variant={ButtonType.SECONDARY}
                     >
                         Give Feedback
@@ -81,45 +56,45 @@ export const SessionActionButtons: React.FC<SessionActionButtonsProps> = ({
                     />
                     <FeedbackModal
                         sessionId={sessionId}
-                        trainerId={trainerId}
+                        trainerId={sessionDetails?.trainer?.id}
                         userRole={userRole}
                         isOpen={feedbackModalOpen}
                         onClose={() => setFeedbackModalOpen(false)}
                     />
                 </>
-            )}
-            {uploadAssignment && (
+            }
+            {(isAdmin || userRole === UserRoleType.CANDIDATE) && (
                 <>
                     <Button
-                        onClick={handleUploadAssignment}
+                        onClick={() => setUploadAssignmentModalOpen(true)}
                         variant={ButtonType.SECONDARY}
                     >
                         Upload Assignment
                     </Button>
                     <UploadAssignmentsModal
-                        isOpen={uploadModalOpen}
-                        onClose={() => setUploadModalOpen(false)}
+                        isOpen={uploadAssignmentModalOpen}
+                        onClose={() => setUploadAssignmentModalOpen(false)}
                     />
                 </>
             )}
-            {uploadMaterials && (
+            {(isAdmin || userRole === UserRoleType.TRAINER) && (
                 <>
                     <Button
-                        onClick={handleUploadMaterials}
+                        onClick={() => setUploadMaterialModalOpen(true)}
                         variant={ButtonType.SECONDARY}
                     >
                         Upload Materials
                     </Button>
                     <UploadMaterialsModal
-                        isOpen={uploadModalOpen}
-                        onClose={() => setUploadModalOpen(false)}
+                        isOpen={uploadMaterialModalOpen}
+                        onClose={() => setUploadMaterialModalOpen(false)}
                     />
                 </>
             )}
             {
                 <>
                     <Button
-                        onClick={handleViewMaterials}
+                        onClick={() => setViewMaterialModalOpen(true)}
                         variant={ButtonType.SECONDARY}
                     >
                         View Materials
@@ -127,7 +102,7 @@ export const SessionActionButtons: React.FC<SessionActionButtonsProps> = ({
                     <MaterialsModal
                         isOpen={viewMaterialModalOpen}
                         onClose={() => setViewMaterialModalOpen(false)}
-                        materials={sessionDetailsData?.materials}
+                        materials={sessionDetails?.materials}
                     />
                 </>
             }
@@ -136,7 +111,7 @@ export const SessionActionButtons: React.FC<SessionActionButtonsProps> = ({
                 userRole == UserRoleType.MODERATOR) && (
                 <>
                     <Button
-                        onClick={handleViewAssignments}
+                        onClick={() => setViewAssignmentModalOpen(true)}
                         variant={ButtonType.SECONDARY}
                     >
                         View Assignments
