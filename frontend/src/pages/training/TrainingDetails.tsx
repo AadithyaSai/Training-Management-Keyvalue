@@ -2,6 +2,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { DashboardCardType } from "../../components/dashboardCard/DashboardCard";
 import DashboardCardList from "../../components/dashboardCardList/DashboardCardList";
 import EventList, {
+    EventListType,
     formatTrainingList,
 } from "../../components/eventList/EventList";
 import Layout from "../../components/layout/Layout";
@@ -12,7 +13,8 @@ import {
 } from "../../api-service/training/training.api";
 import Button, { ButtonType } from "../../components/button/Button";
 import { useEffect } from "react";
-import { jwtDecode } from "jwt-decode";
+import { useSelector } from "react-redux";
+import { getUserDetails } from "../../store/slices/userSlice";
 
 const TrainingDetails = () => {
     const { trainingId } = useParams();
@@ -22,9 +24,7 @@ const TrainingDetails = () => {
         id: trainingId,
     });
 
-    const token = localStorage.getItem("token");
-    const decoded: { id: number, isAdmin: boolean } = jwtDecode(token || "");
-    const { id: userId, isAdmin } = decoded;
+    const { id: userId, isAdmin } = useSelector(getUserDetails);
 
     const [deleteTraining] = useDeleteTrainingMutation();
 
@@ -87,7 +87,7 @@ const TrainingDetails = () => {
                 />
                 <EventList
                     isAdmin={isAdmin}
-                    heading="Sessions"
+                    eventType={EventListType.SESSION}
                     showCreateButton={isAdmin}
                     onCreateClick={() => navigate("session/create")}
                     data={formatTrainingList(trainingDetails?.sessions)}

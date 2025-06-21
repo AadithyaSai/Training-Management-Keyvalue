@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { jwtDecode } from "jwt-decode";
 import {
     useDeleteSessionMutation,
     useGetSessionByIdQuery,
 } from "../../api-service/session/session.api";
 import { useGetUserRoleInSessionQuery } from "../../api-service/user/user.api";
-import { useGetFeedbacksBySessionIdQuery } from "../../api-service/feedback/feedback.api";
+import { useGetFeedbackListQuery, useGetFeedbacksBySessionIdQuery } from "../../api-service/feedback/feedback.api";
 import Layout from "../../components/layout/Layout";
 import { SessionContent } from "./components/SessionContent";
 import { SessionActionButtons } from "./components/SessionActionButtons";
@@ -16,32 +15,34 @@ import {
     UserRoleType,
 } from "./components/sessionTypes";
 import Button, { ButtonType } from "../../components/button/Button";
+import { useSelector } from "react-redux";
+import {
+    getUserDetails,
+    type UserStateData,
+} from "../../store/slices/userSlice";
 
 const SessionDetails = () => {
     const [sessionDetails, setSessionDetails] = useState<SessionData>({
-        trainer: { id: 0, name: "Trainer of Session 1" },
+        trainer: { id: 0, name: "" },
         moderators: [],
         description: "",
         materials: [],
         materialQualityFeedback: "",
         sessionFeedback: "",
     });
-
-    const { trainingId, sessionId } = useParams();
+    
     const navigate = useNavigate();
+    const { trainingId, sessionId } = useParams();
     const { data: sessionDetailsData } = useGetSessionByIdQuery({
         id: sessionId,
     });
-
+    const { data: feedbackList } = useGetFeedbacksBySessionIdQuery({ sessionId });
     const [deleteSession, { isLoading }] = useDeleteSessionMutation();
-    const { data: feedbackList } = useGetFeedbacksBySessionIdQuery({
-        sessionId,
-    });
 
     useEffect(() => {
         if (!sessionDetailsData) return;
 
-        const userDetails = sessionDetailsData.userSessions.map(
+        const sessionUserDetails = sessionDetailsData.userSessions.map(
             (userSession: {
                 id: number;
                 role: UserRole;
@@ -52,11 +53,10 @@ const SessionDetails = () => {
                 name: userSession.user.name,
             })
         );
-
-        const trainer = userDetails.filter(
+        const trainer = sessionUserDetails.filter(
             (user: { role: UserRole }) => user.role === UserRoleType.TRAINER
         )[0];
-        const moderators = userDetails.filter(
+        const moderators = sessionUserDetails.filter(
             (user: { role: UserRole }) => user.role === UserRoleType.MODERATOR
         );
 
@@ -73,21 +73,18 @@ const SessionDetails = () => {
         });
     }, [sessionDetailsData]);
 
-    const token = localStorage.getItem("token");
-    const decoded: { isAdmin: boolean; id: number } = jwtDecode(token || "");
-    const { isAdmin, id: userId } = decoded;
+    const userDetails: UserStateData = useSelector(getUserDetails);
+    const { isAdmin, id: userId } = userDetails;
     const { data: userRole } = useGetUserRoleInSessionQuery({
         userId,
         sessionId,
     });
 
-    console.log(userRole);
-
     return (
         <Layout
             userRole={userRole}
             title={sessionDetailsData?.title || "Session Title"}
-            isLoading={isLoading || !sessionDetailsData}
+            isLoading={isLoading || !sessionDetails}
             endAdornments={
                 isAdmin && (
                     <div className="flex gap-3">

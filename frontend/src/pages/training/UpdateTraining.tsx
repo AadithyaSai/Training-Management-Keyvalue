@@ -14,7 +14,8 @@ import {
 } from "../session/components/sessionTypes";
 import CreateUserPool from "../createUserPool/CreateUserPool";
 import type { TrainingDetailsData, UserPoolData } from "./CreateTraining";
-import { jwtDecode } from "jwt-decode";
+import { useSelector } from "react-redux";
+import { getUserDetails } from "../../store/slices/userSlice";
 
 const UpdateTraining = () => {
     const { trainingId } = useParams();
@@ -23,9 +24,7 @@ const UpdateTraining = () => {
         id: trainingId,
     });
 
-    const token = localStorage.getItem("token");
-    const decoded: { id: number } = jwtDecode(token || "");
-    const userId = decoded.id;
+    const userId = useSelector(getUserDetails)
 
     const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();

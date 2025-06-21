@@ -1,8 +1,8 @@
 import { useNavigate } from "react-router-dom";
-import type { UserRole } from "../../pages/session/components/sessionTypes";
-import { jwtDecode } from "jwt-decode";
 import { MdOutlineSpaceDashboard } from "react-icons/md";
 import { FaRegCalendarCheck } from "react-icons/fa";
+import { useDispatch } from "react-redux";
+import { removeUser, type UserStateData } from "../../store/slices/userSlice";
 
 interface NavbarItemProps {
     label?: string;
@@ -11,7 +11,7 @@ interface NavbarItemProps {
 }
 
 interface NavbarProps {
-    userRole?: UserRole;
+    userDetails?: UserStateData;
 }
 
 const NavbarItem = ({
@@ -34,32 +34,31 @@ const NavbarItem = ({
     );
 };
 
-const Navbar: React.FC<NavbarProps> = ({ userRole }) => {
+const Navbar: React.FC<NavbarProps> = ({ userDetails }) => {
     const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     const handleLogout = () => {
         localStorage.removeItem("token");
-        navigate("/", { replace: true });
+        dispatch(removeUser());
+        navigate("/login", { replace: true });
     };
 
-    const token = localStorage.getItem("token");
-    const decoded: { id: number; isAdmin: boolean } = jwtDecode(token || "");
-    const { isAdmin, id: userId } = decoded;
 
     return (
         <nav className="fixed top-headerHeight left-0 bottom-0 w-navbarWidth bg-cardColor text-white shadow-bgColor shadow-xl py-6 z-40 border-t-transparent flex flex-col">
             <div className="px-5 py-1 mb-4">
                 <div className="w-full flex gap-4 items-center p-3 rounded-md">
-                    <span className="size-12 rounded-full bg-gray-200 text-black text-xl overflow-clip flex items-center justify-center">
-                        U
+                    <span className="size-12 rounded-full bg-gray-200 text-black text-[24px] overflow-clip flex items-center justify-center">
+                        {userDetails?.username[0].toUpperCase() || "U"}
                     </span>
                     <div className="flex flex-col">
-                        <span className="text-white text-xl">Username</span>
+                        <span className="text-white text-xl">{userDetails?.username || "Username"}</span>
                         <p className="text-green-500 text-sm font-bold">
-                            {isAdmin
+                            {userDetails?.isAdmin
                                 ? "ADMIN"
-                                : userRole &&
-                                  `Role : ${userRole.toUpperCase()}`}
+                                : userDetails?.role &&
+                                  `Role : ${userDetails?.role.toUpperCase()}`}
                         </p>
                     </div>
                 </div>
@@ -71,18 +70,18 @@ const Navbar: React.FC<NavbarProps> = ({ userRole }) => {
                         label="Dashboard"
                         icon={<MdOutlineSpaceDashboard />}
                         navTo={
-                            isAdmin
-                                ? `/adminDashboard/${userId}`
-                                : `/dashboard/${userId}`
+                            userDetails?.isAdmin
+                                ? `/adminDashboard/${userDetails?.id}`
+                                : `/dashboard/${userDetails?.id}`
                         }
                     />
                     <NavbarItem
                         label="Calendar"
                         icon={<FaRegCalendarCheck />}
                         navTo={
-                            isAdmin
-                                ? `/adminDashboard/${userId}`
-                                : `/dashboard/${userId}`
+                            userDetails?.isAdmin
+                                ? `/adminDashboard/${userDetails?.id}`
+                                : `/dashboard/${userDetails?.id}`
                         }
                     />
                 </ul>

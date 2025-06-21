@@ -31,9 +31,11 @@ server.get("/health", (req, res) => {
 // Import routes
 server.use("/auth", authRouter);
 
+server.use("/users", userRouter);
+
 server.use(authMiddleware); // Apply auth middleware to all routes below this point
 
-server.use("/users", userRouter);
+// server.use("/users", userRouter);
 server.use("/session", sessionRouter);
 server.use("/material", materialRouter);
 server.use("/trainings", trainingRouter);

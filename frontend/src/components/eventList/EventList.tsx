@@ -12,6 +12,11 @@ const EventStatusType = {
     COMPLETED: "Completed",
 } as const;
 
+export const EventListType = {
+    TRAINING: "Training",
+    SESSION: "Session"
+} as const;
+
 export type EventProps = {
     id: number;
     title: string;
@@ -28,12 +33,12 @@ export type EventProps = {
 
 type EventItem = {
     item: EventProps;
-    heading: string;
+    eventType: typeof EventListType[keyof typeof EventListType];
     isAdmin: boolean;
 };
 
 type EventListProps = {
-    heading: string;
+    eventType: typeof EventListType[keyof typeof EventListType];
     isAdmin: boolean;
     showCreateButton?: boolean;
     onCreateClick?: () => void;
@@ -56,13 +61,13 @@ export const formatTrainingList = (trainingDetailsList: Array<EventProps>) => {
     return formattedTrainingList;
 };
 
-const EventListItem: React.FC<EventItem> = ({ item, heading }) => {
+const EventListItem: React.FC<EventItem> = ({ item, eventType }) => {
     const navigate = useNavigate();
     return (
         <div
             className="border border-gray-700 p-4 rounded-lg bg-cardColor cursor-pointer transform transition-all duration-300 ease-in-out hover:scale-[1.015] hover:shadow-lg hover:bg-[#2c2c2c]"
             onClick={() =>
-                heading == "session"
+                eventType == EventListType.SESSION
                     ? navigate(`session/${item.id}`)
                     : navigate(`/training/${item.id}`)
             }
@@ -80,7 +85,7 @@ const EventListItem: React.FC<EventItem> = ({ item, heading }) => {
             </div>
             <div className="flex flex-col gap-1 mt-2">
                 <p className="text-sm mt-1 text-gray-400">{item.description}</p>
-                {heading == "session" ? (
+                {eventType == EventListType.SESSION ? (
                     <p className="text-sm mt-1 text-white">
                         Date : {dayjs(item.date).format("DD/MM/YYYY")}
                     </p>
@@ -125,7 +130,7 @@ const EventListItem: React.FC<EventItem> = ({ item, heading }) => {
 };
 
 const EventList: React.FC<EventListProps> = ({
-    heading,
+    eventType,
     isAdmin,
     showCreateButton = false,
     onCreateClick,
@@ -139,7 +144,7 @@ const EventList: React.FC<EventListProps> = ({
     const filteredData = (data || []).filter(
         (item) =>
             item.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
-            (heading != "Sessions" ||
+            (eventType === EventListType.SESSION ||
                 statusFilter.toLowerCase() == "all" ||
                 item.status === statusFilter)
     );
@@ -147,18 +152,18 @@ const EventList: React.FC<EventListProps> = ({
         <div className="text-white w-full">
             <div className="flex flex-col items-center border border-borderColor px-2 py-4 rounded-lg bg-cardColor">
                 <div className="flex justify-between items-center mb-4 p-4 rounded-lg bg-cardColor w-full">
-                    <h2 className="text-3xl font-bold">{heading}</h2>
+                    <h2 className="text-3xl font-bold">{eventType}s</h2>
                     <div className="flex items-center space-x-3">
                         {isAdmin && showCreateButton && (
                             <button
                                 className="bg-white text-black px-4 py-2 rounded hover:bg-gray-200"
                                 onClick={onCreateClick}
                             >
-                                Create {heading.slice(0, -1)} +
+                                Create {eventType.slice(0, -1)} +
                             </button>
                         )}
 
-                        {heading == "Sessions" && (
+                        {eventType === EventListType.SESSION && (
                             <select
                                 className="bg-itemColor border border-borderColor px-3 py-2 rounded"
                                 value={statusFilter}
@@ -223,7 +228,7 @@ const EventList: React.FC<EventListProps> = ({
                                 isAdmin={isAdmin}
                                 key={index}
                                 item={item}
-                                heading={heading.slice(0, -1).toLowerCase()}
+                                eventType={eventType}
                             />
                         ))
                     )}

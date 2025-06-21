@@ -1,7 +1,7 @@
 
 import { useGetUserDashboardDataQuery } from "../../api-service/user/user.api";
 import DashboardCardList from "../../components/dashboardCardList/DashboardCardList";
-import EventList, { formatTrainingList } from "../../components/eventList/EventList";
+import EventList, { EventListType, formatTrainingList } from "../../components/eventList/EventList";
 import Layout from "../../components/layout/Layout";
 import { useParams } from "react-router-dom";
 
@@ -44,7 +44,7 @@ const CommonDashboard = () => {
                 />
                 <EventList
                     isAdmin={false}
-                    heading="Trainings"
+                    eventType={EventListType.TRAINING}
                     showCreateButton={false}
                     data={formatTrainingList(userDashboardData?.totalPrograms)}
                 />

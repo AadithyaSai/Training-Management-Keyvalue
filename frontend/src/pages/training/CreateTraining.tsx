@@ -10,7 +10,8 @@ import {
     type UserRole,
 } from "../session/components/sessionTypes";
 import CreateUserPool from "../createUserPool/CreateUserPool";
-import { jwtDecode } from "jwt-decode";
+import { useSelector } from "react-redux";
+import { getUserDetails } from "../../store/slices/userSlice";
 export interface UserPoolData {
     userId: number;
     role: string;
@@ -46,9 +47,7 @@ const CreateTraining = () => {
     const navigate = useNavigate();
     const [createTraining, { isLoading }] = useCreateTrainingMutation();
 
-    const token = localStorage.getItem("token");
-    const decoded: { id: number } = jwtDecode(token || "");
-    const userId = decoded.id;
+    const userId = useSelector(getUserDetails).id;
 
     const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();

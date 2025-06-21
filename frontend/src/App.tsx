@@ -1,20 +1,33 @@
-import { Provider } from "react-redux";
+import { lazy, Suspense } from "react";
 import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
-import store from "./store/store";
+import { Provider } from "react-redux";
+import { PersistGate } from "redux-persist/integration/react";
+import store, { persistor } from "./store/store";
 
 import Login from "./pages/login/Login";
-import AdminDashboard from "./pages/adminDashboard/AdminDashboard";
-import CommonDashboard from "./pages/commonDashboard/CommonDashboard";
-import TrainingDetails from "./pages/training/TrainingDetails";
-import CreateTraining from "./pages/training/CreateTraining";
-import UpdateTraining from "./pages/training/UpdateTraining";
-import Calendar from "./components/calendar/Calendar";
-import SessionDetails from "./pages/session/SessionDetails";
-import CreateSession from "./pages/session/CreateSession";
-import UpdateSession from "./pages/session/UpdateSession";
 import NotFound from "./components/error/notFound/NoutFound";
+import { PacmanFullScreen } from "./components/loader/Pacman";
+
+const AdminDashboard = lazy(
+    () => import("./pages/adminDashboard/AdminDashboard")
+);
+const CommonDashboard = lazy(
+    () => import("./pages/commonDashboard/CommonDashboard")
+);
+const TrainingDetails = lazy(() => import("./pages/training/TrainingDetails"));
+const CreateTraining = lazy(() => import("./pages/training/CreateTraining"));
+const UpdateTraining = lazy(() => import("./pages/training/UpdateTraining"));
+const Calendar = lazy(() => import("./components/calendar/Calendar"));
+const SessionDetails = lazy(() => import("./pages/session/SessionDetails"));
+const CreateSession = lazy(() => import("./pages/session/CreateSession"));
+const UpdateSession = lazy(() => import("./pages/session/UpdateSession"));
 
 const router = createBrowserRouter([
+    {
+        path: "/",
+        element: <Login />,
+        errorElement: <NotFound />,
+    },
     {
         path: "/login",
         element: <Login />,
@@ -22,17 +35,29 @@ const router = createBrowserRouter([
     },
     {
         path: "/adminDashboard/:userId",
-        element: <AdminDashboard />,
+        element: (
+            <Suspense fallback={<PacmanFullScreen />}>
+                <AdminDashboard />
+            </Suspense>
+        ),
         errorElement: <NotFound />,
     },
     {
         path: "/dashboard/:userId",
-        element: <CommonDashboard />,
+        element: (
+            <Suspense fallback={<PacmanFullScreen />}>
+                <CommonDashboard />
+            </Suspense>
+        ),
         errorElement: <NotFound />,
     },
     {
         path: "/training",
-        element: <Outlet />,
+        element: (
+            <Suspense fallback={<PacmanFullScreen />}>
+                <Outlet />
+            </Suspense>
+        ),
         children: [
             {
                 path: "create",
@@ -98,7 +123,9 @@ const router = createBrowserRouter([
 function App() {
     return (
         <Provider store={store}>
-            <RouterProvider router={router} />
+            <PersistGate loading={null} persistor={persistor}>
+                <RouterProvider router={router} />
+            </PersistGate>
         </Provider>
     );
 }
