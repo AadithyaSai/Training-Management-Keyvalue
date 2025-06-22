@@ -252,23 +252,35 @@ export class SessionService {
 		return result;
 	}
 	async addUsersToSession(
-		session_id: number,
+		sessionId: number,
 		userSessionDto: CreateUserSessionDto
-	): Promise<UserSession[]> {
-		const users = userSessionDto.users.map(({ id, role }) => {
-			return {
-				id: id,
-				role: role as Role,
-			};
-		});
-		//add check
+	) {
+		const errorUsers: { id: number; role: Role }[] = [];
+		const validUsers: { id: number; role: Role }[] = [];
+		const training = (await this.findOneById(sessionId)).training;
+
+		for (const { id, role } of userSessionDto.users) {
+			const member = training.members.find(
+				(member: TrainingUser) =>
+					member.user.id === id && member.role === role
+			);
+			if (member) {
+				validUsers.push({ id, role: role as Role });
+			} else {
+				errorUsers.push({ id, role: role as Role });
+			}
+		}
+
 		const result = await this.userSessionRepository.addUsersToSession(
-			session_id,
-			users
+			sessionId,
+			validUsers
 		);
 
 		this.logger.info(`User Session created: ${result}`);
-		return result;
+		return JSON.stringify({
+			success: result,
+			error: errorUsers,
+		});
 	}
 	async removeUsersFromSession(
 		sessionId: number,
