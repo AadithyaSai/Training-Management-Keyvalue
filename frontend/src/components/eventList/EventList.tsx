@@ -140,7 +140,6 @@ const EventList: React.FC<EventListProps> = ({
         String(EventStatusType.DEFAULT)
     );
     const [searchTerm, setSearchTerm] = useState("");
-    if (!data) return <></>;
     const filteredData = (data || []).filter(
         (item) =>
             item.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
@@ -159,7 +158,7 @@ const EventList: React.FC<EventListProps> = ({
                                 className="bg-white text-black px-4 py-2 rounded hover:bg-gray-200"
                                 onClick={onCreateClick}
                             >
-                                Create {eventType.slice(0, -1)} +
+                                Create {eventType} +
                             </button>
                         )}
 

@@ -1,14 +1,12 @@
 import baseApi, { ApiTagType } from "../baseApi";
+import type { User } from "../users/user.type";
 
 export const userApi = baseApi.injectEndpoints({
     endpoints: (builder) => ({
-        getUserDashboardData: builder.query({
-            query: (payload) => ({
-                url: `/analytics/users/${payload.id}`,
-                method: "GET",
-            }),
-            providesTags: [ApiTagType.USER],
+        getUserList: builder.query<User[], void>({
+            query: () => ({ url: "/users", method: "GET" }),
         }),
+
         getUserById: builder.query({
             query: (payload) => ({
                 url: `/users/${payload.id}`,
@@ -16,6 +14,15 @@ export const userApi = baseApi.injectEndpoints({
             }),
             providesTags: [ApiTagType.USER],
         }),
+
+        getUserDashboardData: builder.query({
+            query: (payload) => ({
+                url: `/analytics/users/${payload.id}`,
+                method: "GET",
+            }),
+            providesTags: [ApiTagType.USER],
+        }),
+
         getUserRoleInSession: builder.query({
             query: (payload) => ({
                 url: `/session/${payload.sessionId}/roles/${payload.userId}`,
@@ -36,8 +43,9 @@ export const userApi = baseApi.injectEndpoints({
 });
 
 export const {
-    useGetUserDashboardDataQuery,
+    useGetUserListQuery,
     useGetUserByIdQuery,
+    useGetUserDashboardDataQuery,
     useGetUserRoleInSessionQuery,
     useCreateUserMutation,
 } = userApi;

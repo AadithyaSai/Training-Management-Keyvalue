@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { useCreateFeedbackMutation } from "../../../../api-service/feedback/feedback.api";
-import { UserRoleType, type UserRole } from "../sessionTypes";
-import Button, { ButtonType } from "../../../../components/button/Button";
+import { useCreateFeedbackMutation } from "../../api-service/feedback/feedback.api";
+import { UserRoleType, type UserRole } from "../../pages/session/components/sessionTypes";
+import Button, { ButtonType } from "../button/Button";
 import type { CandidateData } from "./CandidateListModal";
 import { useSelector } from "react-redux";
-import { getUserDetails } from "../../../../store/slices/userSlice";
+import { getUserDetails } from "../../store/slices/userSlice";
 
 interface FeedbackModalProps {
     sessionId: number;

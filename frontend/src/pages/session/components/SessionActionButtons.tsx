@@ -1,12 +1,12 @@
 import { useState } from "react";
 import Button, { ButtonType } from "../../../components/button/Button";
 import { UserRoleType, type SessionData, type UserRole } from "./sessionTypes";
-import { UploadMaterialsModal } from "./modals/UploadMaterialsModal";
-import { FeedbackModal } from "./modals/FeedbackModal";
-import { CandidateListModal } from "./modals/CandidateListModal";
-import { UploadAssignmentsModal } from "./modals/UploadAssignmentsModal";
-import MaterialsModal from "./modals/ViewMaterialModal";
-import ViewAssignmentsModal from "./modals/ViewAssignmentModal";
+import { UploadMaterialsModal } from "../../../components/modals/UploadMaterialsModal";
+import { FeedbackModal } from "../../../components/modals/FeedbackModal";
+import { CandidateListModal } from "../../../components/modals/CandidateListModal";
+import { UploadAssignmentsModal } from "../../../components/modals/UploadAssignmentsModal";
+import MaterialsModal from "../../../components/modals/ViewMaterialModal";
+import ViewAssignmentsModal from "../../../components/modals/ViewAssignmentModal";
 import { useGetAssignmentListQuery } from "../../../api-service/assignment/viewAssignment.api";
 
 interface SessionActionButtonsProps {

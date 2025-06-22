@@ -5,9 +5,9 @@ import React, {
     useEffect,
 } from "react";
 import { useParams } from "react-router-dom";
-import { useGetSessionByIdQuery } from "../../../../api-service/session/session.api";
-import { useCreateAssignmentMutation } from "../../../../api-service/assignment/assignmentUpload.api";
-import Button, { ButtonType } from "../../../../components/button/Button";
+import { useGetSessionByIdQuery } from "../../api-service/session/session.api";
+import { useCreateAssignmentMutation } from "../../api-service/assignment/assignmentUpload.api";
+import Button, { ButtonType } from "../button/Button";
 
 interface UploadAssignmentsModalProps {
     isOpen: boolean;

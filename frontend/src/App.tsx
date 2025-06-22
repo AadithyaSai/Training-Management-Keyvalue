@@ -7,6 +7,9 @@ import store, { persistor } from "./store/store";
 import Login from "./pages/login/Login";
 import NotFound from "./components/error/notFound/NoutFound";
 import { PacmanFullScreen } from "./components/loader/Pacman";
+import CreateUserPool, {
+    PoolUserRoleType,
+} from "./pages/createUserPool/CreateUserPool";
 
 const AdminDashboard = lazy(
     () => import("./pages/adminDashboard/AdminDashboard")
@@ -63,7 +66,28 @@ const router = createBrowserRouter([
                 path: "create",
                 element: <CreateTraining />,
             },
-
+            {
+                path: "createPool",
+                element: <Outlet />,
+                children: [
+                    {
+                        path: "trainer",
+                        element: <CreateUserPool role={PoolUserRoleType.TRAINER} />,
+                    },
+                    {
+                        path: "moderator",
+                        element: (
+                            <CreateUserPool role={PoolUserRoleType.MODERATOR} />
+                        ),
+                    },
+                    {
+                        path: "candidate",
+                        element: (
+                            <CreateUserPool role={PoolUserRoleType.CANDIDATE} />
+                        ),
+                    },
+                ],
+            },
             {
                 path: ":trainingId",
                 element: <Outlet />,

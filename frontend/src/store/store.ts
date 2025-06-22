@@ -1,8 +1,10 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
-import baseApi from "../api-service/baseApi";
-import userReducer from "./slices/userSlice";
 import { persistStore, persistReducer, FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER } from "redux-persist";
 import storage from "redux-persist/lib/storage";
+import baseApi from "../api-service/baseApi";
+import userReducer from "./slices/userSlice";
+import trainingReducer from "./slices/trainingSlice";
+
 
 const persistConfig = {
     key: "root",
@@ -13,6 +15,7 @@ const persistConfig = {
 
 const rootReducer = combineReducers({
     user: userReducer,
+    training: trainingReducer,
     [baseApi.reducerPath]: baseApi.reducer,
 });
 const persistedReducer = persistReducer(persistConfig, rootReducer);

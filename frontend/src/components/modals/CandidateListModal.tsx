@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { FeedbackModal } from "./FeedbackModal";
-import { UserRoleType, type UserRole } from "../sessionTypes";
-import { useGetSessionByIdQuery } from "../../../../api-service/session/session.api";
+import { UserRoleType, type UserRole } from "../../pages/session/components/sessionTypes";
+import { useGetSessionByIdQuery } from "../../api-service/session/session.api";
 
 export interface CandidateData {
   id: number;
