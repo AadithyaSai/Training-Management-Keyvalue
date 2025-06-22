@@ -7,13 +7,20 @@ import { useNavigate } from "react-router-dom";
 import { useCreateTrainingMutation } from "../../api-service/training/training.api";
 import { useDispatch, useSelector } from "react-redux";
 import { getUserDetails } from "../../store/slices/userSlice";
+import {
+    addTrainingDetails,
+    clearTrainingDetails,
+    getTrainingDetails,
+    type TrainingSliceState,
+} from "../../store/slices/trainingSlice";
+import {
+    PoolUserRoleType,
+    type PoolUserRole,
+} from "../createUserPool/CreateUserPool";
 import type { User } from "../../api-service/users/user.type";
-import { addTrainingDetails, getTrainingDetails, type TrainingSliceState } from "../../store/slices/trainingSlice";
-import { PoolUserRoleType, type PoolUserRole } from "../createUserPool/CreateUserPool";
-
 
 export interface UserPoolData {
-    userId: number;
+    id: number;
     role: string;
 }
 
@@ -22,32 +29,55 @@ export interface TrainingDetailsData {
     description: string;
     startDate: string;
     endDate: string;
-    members: {
-        trainers: Array<User>;
-        moderators: Array<User>;
-        candidates: Array<User>;
-    };
+    members: Array<UserPoolData>;
 }
 
+const formatUserData = (userList: Array<User>, role: PoolUserRole) => {
+    const formattdUserList: Array<UserPoolData> = userList.map((user) => ({
+        id: user.id,
+        role: role.toLowerCase(),
+    }));
+    return formattdUserList;
+};
+
+export const formatTrainingDetails = (trainingDetails: TrainingSliceState) => {
+    const formattedTrainingDetails: TrainingDetailsData = {
+        ...trainingDetails,
+        members: [
+            ...formatUserData(
+                trainingDetails.members.trainers,
+                PoolUserRoleType.TRAINER
+            ),
+            ...formatUserData(
+                trainingDetails.members.moderators,
+                PoolUserRoleType.MODERATOR
+            ),
+            ...formatUserData(
+                trainingDetails.members.candidates,
+                PoolUserRoleType.CANDIDATE
+            ),
+        ],
+    };
+    return formattedTrainingDetails;
+};
+
 const CreateTraining = () => {
-    const storedTrainingDetails: TrainingSliceState = useSelector(getTrainingDetails);
-    const [trainingDetails, setTrainingDetails] = useState<TrainingSliceState>(
-        {
-            title: "",
-            description: "",
-            startDate: "",
-            endDate: "",
-            members: {
-                trainers: [],
-                moderators: [],
-                candidates: [],
-            },
-        }
-    );
+    const storedTrainingDetails: TrainingSliceState =
+        useSelector(getTrainingDetails);
+    const [trainingDetails, setTrainingDetails] = useState<TrainingSliceState>({
+        title: "",
+        description: "",
+        startDate: "",
+        endDate: "",
+        members: {
+            trainers: [],
+            moderators: [],
+            candidates: [],
+        },
+    });
 
     useEffect(() => {
-        if(!storedTrainingDetails)
-            return;
+        if (!storedTrainingDetails) return;
         setTrainingDetails({
             ...storedTrainingDetails,
             members: {
@@ -55,9 +85,9 @@ const CreateTraining = () => {
                 moderators: [...storedTrainingDetails.members.moderators],
                 candidates: [...storedTrainingDetails.members.candidates],
             },
-        })
-    }, [storedTrainingDetails])
-    
+        });
+    }, [storedTrainingDetails]);
+
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const [createTraining, { isLoading }] = useCreateTrainingMutation();
@@ -66,9 +96,10 @@ const CreateTraining = () => {
 
     const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        createTraining(trainingDetails)
+        createTraining(formatTrainingDetails(trainingDetails))
             .unwrap()
             .then(() => {
+                dispatch(clearTrainingDetails());
                 navigate(`/adminDashboard/${userId}`);
             })
             .catch((error) => {
@@ -77,10 +108,10 @@ const CreateTraining = () => {
     };
 
     const handlePoolOpen = (role: PoolUserRole) => {
-        const urlRole = role.toLowerCase(); 
+        const urlRole = role.toLowerCase();
         dispatch(addTrainingDetails(trainingDetails));
         navigate(`/training/createPool/${urlRole}`);
-    }
+    };
 
     return (
         <Layout title="Create Training" isLoading={isLoading}>
@@ -139,20 +170,35 @@ const CreateTraining = () => {
                     <ActionButton
                         label="Add Trainer to Pool"
                         onClick={() => handlePoolOpen(PoolUserRoleType.TRAINER)}
-                        endAdornment={<span>({trainingDetails.members.trainers.length} added)</span>}
+                        endAdornment={
+                            <span>
+                                ({trainingDetails.members.trainers.length}{" "}
+                                added)
+                            </span>
+                        }
                     />
                     <ActionButton
                         label="Add Moderators to Pool"
-                        onClick={() => handlePoolOpen(PoolUserRoleType.MODERATOR)}
+                        onClick={() =>
+                            handlePoolOpen(PoolUserRoleType.MODERATOR)
+                        }
                         endAdornment={
-                            <span>({trainingDetails.members.moderators.length} added)</span>
+                            <span>
+                                ({trainingDetails.members.moderators.length}{" "}
+                                added)
+                            </span>
                         }
                     />
                     <ActionButton
                         label="Add Candidates to Pool"
-                        onClick={() => handlePoolOpen(PoolUserRoleType.CANDIDATE)}
+                        onClick={() =>
+                            handlePoolOpen(PoolUserRoleType.CANDIDATE)
+                        }
                         endAdornment={
-                            <span>({trainingDetails.members.candidates.length} added)</span>
+                            <span>
+                                ({trainingDetails.members.candidates.length}{" "}
+                                added)
+                            </span>
                         }
                     />
                 </div>

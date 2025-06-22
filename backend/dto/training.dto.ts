@@ -19,7 +19,7 @@ class MemberDto {
   role:Role;
 }
 
-export class trainingDto {
+export class TrainingDto {
   @IsNotEmpty()
   @IsString()
   title: string;
