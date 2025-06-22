@@ -11,16 +11,13 @@ import {
 } from "../session/components/sessionTypes";
 import CreateUserPool from "../createUserPool/CreateUserPool";
 import { jwtDecode } from "jwt-decode";
-export interface UserPoolData {
-    userId: number;
-    role: string;
-}
+import type { User } from "../../api-service/users/user.type";
+
 export interface TrainingDetailsData {
     title: string;
     description: string;
     startDate: string;
     endDate: string;
-    members: Array<UserPoolData>;
 }
 const CreateTraining = () => {
     const [displayedPoolType, setDisplayedPoolType] = useState<UserRole | null>(
@@ -32,12 +29,11 @@ const CreateTraining = () => {
             description: "",
             startDate: "",
             endDate: "",
-            members: [],
         }
     );
-    const [trainerPool, setTrainerPool] = useState<Array<UserPoolData>>([]);
-    const [moderatorPool, setModeratorPool] = useState<Array<UserPoolData>>([]);
-    const [candidatePool, setCandidatePool] = useState<Array<UserPoolData>>([]);
+    const [trainerPool, setTrainerPool] = useState<Array<User>>([]);
+    const [moderatorPool, setModeratorPool] = useState<Array<User>>([]);
+    const [candidatePool, setCandidatePool] = useState<Array<User>>([]);
 
     // useEffect(() => {
     //     setTrainingDetails({ ...trainingDetails, members: [...trainerPool, ...moderatorPool, ...candidatePool] })
@@ -52,7 +48,23 @@ const CreateTraining = () => {
 
     const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        createTraining(trainingDetails)
+                const members = trainerPool.map((member) => ({
+            userId: member.id,
+            role: UserRoleType.TRAINER as string,
+        }));
+        members.push(
+            ...moderatorPool.map((member) => ({
+                userId: member.id,
+                role: UserRoleType.MODERATOR,
+            }))
+        );
+        members.push(
+            ...candidatePool.map((member) => ({
+                userId: member.id,
+                role: UserRoleType.CANDIDATE,
+            }))
+        );
+        createTraining({...trainingDetails, members})
             .unwrap()
             .then(() => {
                 navigate(`/adminDashboard/${userId}`);
@@ -75,7 +87,6 @@ const CreateTraining = () => {
                     pool={trainerPool}
                     setPool={setTrainerPool}
                     setPoolType={setDisplayedPoolType}
-                    initialValues={trainerPool}
                 />
             );
         case UserRoleType.MODERATOR:
@@ -85,7 +96,6 @@ const CreateTraining = () => {
                     pool={moderatorPool}
                     setPool={setModeratorPool}
                     setPoolType={setDisplayedPoolType}
-                    initialValues={moderatorPool}
                 />
             );
         case UserRoleType.CANDIDATE:
@@ -95,7 +105,6 @@ const CreateTraining = () => {
                     pool={candidatePool}
                     setPool={setCandidatePool}
                     setPoolType={setDisplayedPoolType}
-                    initialValues={candidatePool}
                 />
             );
         default:

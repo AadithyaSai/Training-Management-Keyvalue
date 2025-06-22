@@ -13,8 +13,9 @@ import {
     type UserRole,
 } from "../session/components/sessionTypes";
 import CreateUserPool from "../createUserPool/CreateUserPool";
-import type { TrainingDetailsData, UserPoolData } from "./CreateTraining";
+import type { TrainingDetailsData } from "./CreateTraining";
 import { jwtDecode } from "jwt-decode";
+import type { User } from "../../api-service/users/user.type";
 
 const UpdateTraining = () => {
     const { trainingId } = useParams();
@@ -35,13 +36,13 @@ const UpdateTraining = () => {
         }));
         members.push(
             ...moderatorPool.map((member) => ({
-                userId: member.userId,
+                userId: member.id,
                 role: UserRoleType.MODERATOR,
             }))
         );
         members.push(
             ...candidatePool.map((member) => ({
-                userId: member.userId,
+                userId: member.id,
                 role: UserRoleType.CANDIDATE,
             }))
         );
@@ -71,13 +72,12 @@ const UpdateTraining = () => {
             title: "",
             description: "",
             startDate: "",
-            endDate: "",
-            members: [],
+            endDate: ""
         }
     );
-    const [trainerPool, setTrainerPool] = useState<Array<UserPoolData>>([]);
-    const [moderatorPool, setModeratorPool] = useState<Array<UserPoolData>>([]);
-    const [candidatePool, setCandidatePool] = useState<Array<UserPoolData>>([]);
+    const [trainerPool, setTrainerPool] = useState<Array<User>>([]);
+    const [moderatorPool, setModeratorPool] = useState<Array<User>>([]);
+    const [candidatePool, setCandidatePool] = useState<Array<User>>([]);
     // useEffect(() => {
     //     setTrainingDetails({ ...trainingDetails, members: [...trainerPool, ...moderatorPool, ...candidatePool] })
     // }, [trainerPool, moderatorPool, candidatePool]);
@@ -97,10 +97,6 @@ const UpdateTraining = () => {
             description: trainingDetailsData.description,
             startDate: trainingDetailsData.startDate,
             endDate: trainingDetailsData.endDate,
-            members: trainingDetailsData.members.map((member) => ({
-                userId: member.user.id,
-                role: member.role.toLowerCase(),
-            })),
         });
         if (trainingDetailsData.members) {
             setTrainerPool(
@@ -129,7 +125,6 @@ const UpdateTraining = () => {
                     pool={trainerPool}
                     setPool={setTrainerPool}
                     setPoolType={setDisplayedPoolType}
-                    initialValues={trainerPool}
                 />
             );
         case UserRoleType.MODERATOR:
@@ -139,7 +134,6 @@ const UpdateTraining = () => {
                     pool={moderatorPool}
                     setPool={setModeratorPool}
                     setPoolType={setDisplayedPoolType}
-                    initialValues={moderatorPool}
                 />
             );
         case UserRoleType.CANDIDATE:
@@ -149,7 +143,6 @@ const UpdateTraining = () => {
                     pool={candidatePool}
                     setPool={setCandidatePool}
                     setPoolType={setDisplayedPoolType}
-                    initialValues={candidatePool}
                 />
             );
         default:

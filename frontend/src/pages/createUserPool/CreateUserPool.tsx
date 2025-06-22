@@ -2,20 +2,19 @@ import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
 import Layout from "../../components/layout/Layout";
 import { useGetUserListQuery } from "../../api-service/users/user.api";
 import type { User } from "../../api-service/users/user.type";
-import type { UserPoolData } from "../training/CreateTraining";
 import Button, { ButtonType } from "../../components/button/Button";
 import type { UserRole } from "../session/components/sessionTypes";
 
 export const PoolUserRole = {
-  TRAINER: "Trainer",
-  MODERATOR: "Moderator",
-  CANDIDATE: "Candidate",
+  TRAINER: "trainer",
+  MODERATOR: "moderator",
+  CANDIDATE: "candidate",
 } as const;
 interface CreateUserPoolProps {
   // role: (typeof PoolUserRole)[keyof typeof PoolUserRole];
   role: (typeof PoolUserRole)[keyof typeof PoolUserRole];
-  pool?: UserPoolData[];
-  setPool: Dispatch<SetStateAction<UserPoolData[]>>;
+  pool?: User[];
+  setPool: Dispatch<SetStateAction<User[]>>;
   setPoolType: Dispatch<SetStateAction<UserRole | null>>;
 }
 interface AddUserModalProps {
@@ -37,7 +36,7 @@ const AddUserModal = ({
   const [tempSelection, setTempSelection] = useState<User[]>(
     initialValues || []
   );
-  const { data: userList } = useGetUserListQuery({});
+  const { data: userList } = useGetUserListQuery();
   const toggleUser = (user: User) => {
     setTempSelection((prev) =>
       prev.some((u) => u.id === user.id)
@@ -50,7 +49,7 @@ const AddUserModal = ({
     console.log("Temp selection updated:", tempSelection);
   }, [tempSelection]);
   const handleAddUsers = () => {
-    onSelect((prev) => Array.from(new Set([...tempSelection])));
+    onSelect((prev) => Array.from(new Set([...prev, ...tempSelection])));
     setTempSelection([]);
     showModal(false);
   };
@@ -142,16 +141,11 @@ const CreateUserPool: React.FC<CreateUserPoolProps> = ({
   setPool,
   setPoolType,
 }) => {
-  const [selectedUsers, setSelectedUsers] = useState<User[]>(pool);
+  const [selectedUsers, setSelectedUsers] = useState<User[]>(pool!);
   const [showModal, setShowModal] = useState(false);
   useEffect(() => {
     if (!setPool) return;
-    setPool([
-      ...selectedUsers.map((user) => ({
-        userId: user.id,
-        role: role,
-      })),
-    ]);
+    setPool(selectedUsers);
   }, [selectedUsers, role, setPool]);
   const handleDelete = (user: User) => {
     setSelectedUsers((prev) => prev.filter((t) => t.id !== user.id));
