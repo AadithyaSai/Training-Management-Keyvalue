@@ -5,10 +5,10 @@ import Button, { ButtonType } from "../../components/button/Button";
 import AddUserToPoolModal from "../../components/modals/AddUserToPoolModal";
 import { useDispatch, useSelector } from "react-redux";
 import {
-    addUsersToPool,
+    addUsersWithRoleToPool,
     getPoolUserDetails,
 } from "../../store/slices/trainingSlice";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 export const PoolUserRoleType = {
     TRAINER: "Trainer",
@@ -85,6 +85,7 @@ const CreateUserPool: React.FC<CreateUserPoolProps> = ({ role }) => {
     const [showModal, setShowModal] = useState(false);
     const navigate = useNavigate();
     const dispatch = useDispatch();
+    const { trainingId } = useParams();
 
     const storedUsers: Array<User> = useSelector(getPoolUserDetails(role));
 
@@ -133,10 +134,12 @@ const CreateUserPool: React.FC<CreateUserPoolProps> = ({ role }) => {
                     <Button
                         variant={ButtonType.PRIMARY}
                         onClick={() => {
-                            dispatch(
-                                addUsersToPool({ role, data: selectedUsers })
-                            );
-                            navigate("/training/create");
+                            dispatch(addUsersWithRoleToPool({ role, data: selectedUsers }));
+                            console.log("Selected", role ," : ", selectedUsers);
+                            if(trainingId)
+                                navigate(`/training/${trainingId}/update`);
+                            else
+                                navigate("/training/create");
                         }}
                     >
                         Save {role} Pool

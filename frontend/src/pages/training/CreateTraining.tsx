@@ -20,7 +20,7 @@ import {
 import type { User } from "../../api-service/users/user.type";
 
 export interface UserPoolData {
-    id: number;
+    userId: number;
     role: string;
 }
 
@@ -34,7 +34,7 @@ export interface TrainingDetailsData {
 
 const formatUserData = (userList: Array<User>, role: PoolUserRole) => {
     const formattdUserList: Array<UserPoolData> = userList.map((user) => ({
-        id: user.id,
+        userId: user.id,
         role: role.toLowerCase(),
     }));
     return formattdUserList;
@@ -110,7 +110,7 @@ const CreateTraining = () => {
     const handlePoolOpen = (role: PoolUserRole) => {
         const urlRole = role.toLowerCase();
         dispatch(addTrainingDetails(trainingDetails));
-        navigate(`/training/createPool/${urlRole}`);
+        navigate(`/training/create/createPool/${urlRole}`);
     };
 
     return (

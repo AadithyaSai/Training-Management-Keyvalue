@@ -1,9 +1,15 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import { getUserDetails } from "../../store/slices/userSlice";
-import { type TrainingSliceState } from "../../store/slices/trainingSlice";
+import {
+    addTrainingDetails,
+    addUsersToPool,
+    clearTrainingDetails,
+    getTrainingDetails,
+    type TrainingSliceState,
+} from "../../store/slices/trainingSlice";
 
 import Layout from "../../components/layout/Layout";
 import ActionButton from "../../components/actionButton/ActionButton";
@@ -14,9 +20,14 @@ import {
     useUpdateTrainingMutation,
 } from "../../api-service/training/training.api";
 import { formatTrainingDetails } from "./CreateTraining";
-import { PoolUserRoleType, type PoolUserRole } from "../createUserPool/CreateUserPool";
+import {
+    PoolUserRoleType,
+    type PoolUserRole,
+} from "../createUserPool/CreateUserPool";
+import { getTrainingUsers } from "./TrainingDetails";
 
 const UpdateTraining = () => {
+    const [pageLoading, setPageLoading] = useState(false);
     const { trainingId } = useParams();
     const [updateTraining, { isLoading }] = useUpdateTrainingMutation();
     const { data: trainingDetailsData } = useGetTrainingByIdQuery({
@@ -25,6 +36,7 @@ const UpdateTraining = () => {
 
     const userId = useSelector(getUserDetails);
     const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     const [trainingDetails, setTrainingDetails] = useState<TrainingSliceState>({
         title: "",
@@ -38,24 +50,34 @@ const UpdateTraining = () => {
         },
     });
 
+    const storedTrainingDetails: TrainingSliceState =
+        useSelector(getTrainingDetails);
+
     useEffect(() => {
-        if (!trainingDetailsData) return;
+        if (!trainingDetailsData || !storedTrainingDetails) return;
+        if(trainingDetailsData.id === storedTrainingDetails.id)
+            return;
+        dispatch(addTrainingDetails(trainingDetailsData));
+        const users = getTrainingUsers(trainingDetailsData);
+        if (users) dispatch(addUsersToPool(users));
+    }, [trainingDetailsData]);
+
+    useEffect(() => {
+        if (!storedTrainingDetails) return;
         setTrainingDetails({
-            title: trainingDetailsData.title,
-            description: trainingDetailsData.description,
-            startDate: trainingDetailsData.startDate,
-            endDate: trainingDetailsData.endDate,
+            ...storedTrainingDetails,
             members: {
-                trainers: [],
-                moderators: [],
-                candidates: [],
+                trainers: [...storedTrainingDetails.members.trainers],
+                moderators: [...storedTrainingDetails.members.moderators],
+                candidates: [...storedTrainingDetails.members.candidates],
             },
         });
-    }, [trainingDetailsData]);
+    }, [storedTrainingDetails]);
 
     const handlePoolOpen = (role: PoolUserRole) => {
         const urlRole = role.toLowerCase();
-        navigate(`/training/createPool/${urlRole}`);
+        dispatch(addTrainingDetails(trainingDetails));
+        navigate(`/training/${trainingId}/update/createPool/${urlRole}`);
     };
 
     const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -65,8 +87,9 @@ const UpdateTraining = () => {
             data: formatTrainingDetails(trainingDetails),
         })
             .unwrap()
-            .then((data) => {
-                console.log("[UPDATED]", data);
+            .then(() => {
+                setPageLoading(true);
+                dispatch(clearTrainingDetails());
                 navigate(`/training/${trainingId}`);
             })
             .catch((error) => {
@@ -75,7 +98,7 @@ const UpdateTraining = () => {
     };
 
     return (
-        <Layout title="Update Training" isLoading={isLoading}>
+        <Layout title="Update Training" isLoading={isLoading || pageLoading}>
             <form
                 onSubmit={handleSubmit}
                 className="flex flex-col w-full gap-6 mb-6 bg-cardColor border border-borderColor p-4 rounded"
@@ -141,30 +164,28 @@ const UpdateTraining = () => {
                     />
                     <ActionButton
                         label="Add Moderators to Pool"
-                        onClick={() => handlePoolOpen(PoolUserRoleType.TRAINER)}
+                        onClick={() =>
+                            handlePoolOpen(PoolUserRoleType.MODERATOR)
+                        }
                         endAdornment={
                             <span>
-                                ({trainingDetails.members.trainers.length}{" "}
+                                ({trainingDetails.members.moderators.length}{" "}
                                 added)
                             </span>
                         }
                     />
                     <ActionButton
                         label="Add Candidates to Pool"
-                        onClick={() => handlePoolOpen(PoolUserRoleType.TRAINER)}
+                        onClick={() =>
+                            handlePoolOpen(PoolUserRoleType.CANDIDATE)
+                        }
                         endAdornment={
                             <span>
-                                ({trainingDetails.members.trainers.length}{" "}
+                                ({trainingDetails.members.candidates.length}{" "}
                                 added)
                             </span>
                         }
                     />
-                    {/* <ActionButton
-                        label="Create New Session"
-                        onClick={() =>
-                            navigate(`/training/${trainingId}/session/create`)
-                        }
-                    /> */}
                     <ActionButton
                         label="Add Sessions to Schedule"
                         onClick={() =>

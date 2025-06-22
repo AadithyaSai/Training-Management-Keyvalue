@@ -6,21 +6,25 @@ import {
 } from "../../pages/createUserPool/CreateUserPool";
 
 export interface TrainingDetails {
+    id?: number;
     title: string;
     description: string;
     startDate: string;
     endDate: string;
 }
 
+export interface TrainingUserList {
+    trainers: Array<User>;
+    moderators: Array<User>;
+    candidates: Array<User>;
+}
+
 export interface TrainingSliceState extends TrainingDetails {
-    members: {
-        trainers: Array<User>;
-        moderators: Array<User>;
-        candidates: Array<User>;
-    };
+    members: TrainingUserList;
 }
 
 const initialState: TrainingSliceState = {
+    id: 0,
     title: "",
     description: "",
     startDate: "",
@@ -40,6 +44,7 @@ const trainingSlice = createSlice({
             state: TrainingSliceState,
             action: PayloadAction<TrainingDetails>
         ) => {
+            state.id = action.payload.id;
             state.title = action.payload.title;
             state.description = action.payload.description;
             state.startDate = action.payload.startDate;
@@ -47,6 +52,17 @@ const trainingSlice = createSlice({
         },
 
         addUsersToPool: (
+            state: TrainingSliceState,
+            action: PayloadAction<TrainingUserList>
+        ) => {
+            state.members = {
+                trainers: [...action.payload.trainers],
+                moderators: [...action.payload.moderators],
+                candidates: [...action.payload.candidates],
+            };
+        },
+
+        addUsersWithRoleToPool: (
             state: TrainingSliceState,
             action: PayloadAction<{ role: PoolUserRole; data: User[] }>
         ) => {
@@ -66,6 +82,7 @@ const trainingSlice = createSlice({
         },
 
         clearTrainingDetails: (state: TrainingSliceState) => {
+            state.id = initialState.id;
             state.title = initialState.title;
             state.description = initialState.description;
             state.startDate = initialState.startDate;
@@ -75,8 +92,8 @@ const trainingSlice = createSlice({
     },
 });
 
-export const { addTrainingDetails, addUsersToPool, clearTrainingDetails } = trainingSlice.actions;
 export const getTrainingDetails = (state: any) => state.training;
+
 export const getPoolUserDetails = (role: PoolUserRole) => {
     return (state: any) => {
         switch (role) {
@@ -91,4 +108,12 @@ export const getPoolUserDetails = (role: PoolUserRole) => {
         }
     };
 };
+
+export const {
+    addTrainingDetails,
+    addUsersToPool,
+    addUsersWithRoleToPool,
+    clearTrainingDetails,
+} = trainingSlice.actions;
+
 export default trainingSlice.reducer;

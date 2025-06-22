@@ -33,7 +33,7 @@ export default class TrainingService {
         return training;
     }
 
-    async updateTraining(id: number, trainingDto: Partial<Training>) {
+    async updateTraining(id: number, trainingDto: Partial<TrainingDto>) {
         return this.trainingRepository.updateTraining(id, trainingDto);
     }
 

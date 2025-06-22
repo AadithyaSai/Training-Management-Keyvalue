@@ -64,27 +64,41 @@ const router = createBrowserRouter([
         children: [
             {
                 path: "create",
-                element: <CreateTraining />,
-            },
-            {
-                path: "createPool",
                 element: <Outlet />,
                 children: [
                     {
-                        path: "trainer",
-                        element: <CreateUserPool role={PoolUserRoleType.TRAINER} />,
+                        index: true,
+                        element: <CreateTraining />,
                     },
                     {
-                        path: "moderator",
-                        element: (
-                            <CreateUserPool role={PoolUserRoleType.MODERATOR} />
-                        ),
-                    },
-                    {
-                        path: "candidate",
-                        element: (
-                            <CreateUserPool role={PoolUserRoleType.CANDIDATE} />
-                        ),
+                        path: "createPool",
+                        element: <Outlet />,
+                        children: [
+                            {
+                                path: "trainer",
+                                element: (
+                                    <CreateUserPool
+                                        role={PoolUserRoleType.TRAINER}
+                                    />
+                                ),
+                            },
+                            {
+                                path: "moderator",
+                                element: (
+                                    <CreateUserPool
+                                        role={PoolUserRoleType.MODERATOR}
+                                    />
+                                ),
+                            },
+                            {
+                                path: "candidate",
+                                element: (
+                                    <CreateUserPool
+                                        role={PoolUserRoleType.CANDIDATE}
+                                    />
+                                ),
+                            },
+                        ],
                     },
                 ],
             },
@@ -98,7 +112,47 @@ const router = createBrowserRouter([
                     },
                     {
                         path: "update",
-                        element: <UpdateTraining />,
+                        element: <Outlet />,
+                        children: [
+                            {
+                                index: true,
+                                element: <UpdateTraining />,
+                            },
+                            {
+                                path: "createPool",
+                                element: <Outlet />,
+                                children: [
+                                    {
+                                        path: "trainer",
+                                        element: (
+                                            <CreateUserPool
+                                                role={PoolUserRoleType.TRAINER}
+                                            />
+                                        ),
+                                    },
+                                    {
+                                        path: "moderator",
+                                        element: (
+                                            <CreateUserPool
+                                                role={
+                                                    PoolUserRoleType.MODERATOR
+                                                }
+                                            />
+                                        ),
+                                    },
+                                    {
+                                        path: "candidate",
+                                        element: (
+                                            <CreateUserPool
+                                                role={
+                                                    PoolUserRoleType.CANDIDATE
+                                                }
+                                            />
+                                        ),
+                                    },
+                                ],
+                            },
+                        ],
                     },
                     {
                         path: "calendar",

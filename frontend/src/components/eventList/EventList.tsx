@@ -14,7 +14,7 @@ const EventStatusType = {
 
 export const EventListType = {
     TRAINING: "Training",
-    SESSION: "Session"
+    SESSION: "Session",
 } as const;
 
 export type EventProps = {
@@ -33,12 +33,12 @@ export type EventProps = {
 
 type EventItem = {
     item: EventProps;
-    eventType: typeof EventListType[keyof typeof EventListType];
+    eventType: (typeof EventListType)[keyof typeof EventListType];
     isAdmin: boolean;
 };
 
 type EventListProps = {
-    eventType: typeof EventListType[keyof typeof EventListType];
+    eventType: (typeof EventListType)[keyof typeof EventListType];
     isAdmin: boolean;
     showCreateButton?: boolean;
     onCreateClick?: () => void;
@@ -218,8 +218,8 @@ const EventList: React.FC<EventListProps> = ({
 
                 <div className="space-y-4 w-full px-2">
                     {filteredData.length === 0 ? (
-                        <p className="text-center text-gray-500 w-full border-2 border-borderColor py-10">
-                            No trainings found
+                        <p className="text-center text-gray-500 w-full border-2 border-borderColor py-10 rounded-sm">
+                            No {eventType.toLowerCase()}s found
                         </p>
                     ) : (
                         filteredData.map((item, index) => (
