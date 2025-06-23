@@ -9,6 +9,7 @@ import Layout from "../layout/Layout";
 import Button, { ButtonType } from "../button/Button";
 import { useUpdateMultipleSessionsMutation } from "../../api-service/session/session.api";
 import { jwtDecode } from "jwt-decode";
+import { set } from "date-fns";
 
 dayjs.extend(isBetween)
 
@@ -280,6 +281,14 @@ const Calendar = () => {
   const [sessionsList, setSessionsList] = useState<any[]>([]);
 
   useEffect(() => {
+    if (!trainingDetails) return;
+    if (trainingDetails?.endDate && trainingDetails?.startDate) {
+      const start = dayjs(trainingDetails.startDate);
+      const end = dayjs(trainingDetails.endDate);
+      setCurrentMonth(dayjs().isAfter(end.startOf('month')) ? start.startOf("month") : end.startOf("month"));
+    } else {
+      setCurrentMonth(dayjs());
+    }
     if (trainingDetails?.sessions) {
       const initialSessionsList = [...trainingDetails.sessions]
         .sort((a: any, b: any) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
@@ -308,7 +317,7 @@ const Calendar = () => {
     setCalendarItems(initialItems);
     setSessionsList(initialSessionsList);
     }
-  }, [trainingDetails?.sessions]);
+  }, [trainingDetails]);
 
   // 🧩 Handle drop on calendar date
   const handleDropToCalendar = (date: any, session: any) => {
@@ -418,7 +427,7 @@ const Calendar = () => {
   while (day.isBefore(endDay, "day")) {
     const week = [];
     for (let i = 0; i < 7; i++) {
-      const isDroppable = day.isBetween(startDate, endDate)
+      const isDroppable = day.isBetween(startDate, endDate+1)
       const dateKey = day.format("YYYY-MM-DD");
 
       week.push(
