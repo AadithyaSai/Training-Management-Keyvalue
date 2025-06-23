@@ -11,7 +11,7 @@ const CommonDashboard = () => {
         { id: userId }
     );
     const progress: number =
-        Number(((userDashboardData?.upcomingPrograms.length /
+        Number((((userDashboardData?.totalPrograms.length - userDashboardData?.upcomingPrograms.length) /
             userDashboardData?.totalPrograms.length) *
         100).toFixed(0));
     return (
@@ -25,15 +25,15 @@ const CommonDashboard = () => {
                         },
                         {
                             label: "Todays Session",
-                            value: userDashboardData?.todaysSessions.length + 3,
+                            value: userDashboardData?.todaysSessions.length,
                         },
                         {
                             label: "Completed Programs",
-                            value: userDashboardData?.completedPrograms.length + 4,
+                            value: userDashboardData?.completedPrograms.length,
                         },
                         {
                             label: "Upcoming Sessions",
-                            value: userDashboardData?.upcomingSessions.length + 2,
+                            value: userDashboardData?.upcomingSessions.length ,
                         },
                         {
                             label: "Program Stats",
