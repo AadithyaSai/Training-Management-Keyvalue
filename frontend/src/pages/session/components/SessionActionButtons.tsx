@@ -110,7 +110,7 @@ export const SessionActionButtons: React.FC<SessionActionButtonsProps> = ({
 					/>
 				</>
 			}
-			{(isAdmin ||
+			{/* {(isAdmin ||
 				userRole == UserRoleType.TRAINER ||
 				userRole == UserRoleType.MODERATOR) && (
 				<>
@@ -126,7 +126,7 @@ export const SessionActionButtons: React.FC<SessionActionButtonsProps> = ({
 						assignments={assignmentList || []}
 					/>
 				</>
-			)}
+			)} */}
 			{(isAdmin ||
 				userRole == UserRoleType.TRAINER ||
 				userRole == UserRoleType.MODERATOR) && (
