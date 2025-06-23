@@ -126,4 +126,37 @@ export class AssignmentService {
 			assignmentId
 		);
 	}
+	async getAllCandidatesSubmissionsForSession(sessionId: number): Promise<{ candidate: any; submissions: AssignmentSubmission[] }[]> {
+		// Get the session and its assignments
+		const session = await this.sessionService.findOneById(sessionId);
+		if (!session) {
+			throw new HTTPException(404, "Session not found");
+		}
+		const assignments = session.assignments;
+		if (!assignments || assignments.length === 0) {
+			return [];
+		}
+
+		// Get all candidates from session.userSessions with role 'candidate'
+		const candidates = (session.userSessions || [])
+			.filter(us => us.user && us.role === "candidate")
+			.map(us => us.user);
+
+		if (!candidates || candidates.length === 0) {
+			return [];
+		}
+
+		// For each assignment, get its submissions and group by candidate
+		const result: { candidate: any; submissions: AssignmentSubmission[] }[] = [];
+		for (const candidate of candidates) {
+			const submissions: AssignmentSubmission[] = [];
+			for (const assignment of assignments) {
+				const subs = await this.assignmentSubmissionRepository.getSubmissionsByAssignmentId(assignment.id);
+				const candidateSubs = subs.filter(sub => sub.user && sub.user.id === candidate.id);
+				submissions.push(...candidateSubs);
+			}
+			result.push({ candidate, submissions });
+		}
+		return result;
+	}
 }

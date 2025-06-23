@@ -56,6 +56,12 @@ assignmentRouter.get(
 	assignmentController.getAssignmentSubmissions.bind(assignmentController)
 );
 
+assignmentRouter.get(
+	"/:id/submissions/all",
+	assignmentController.getAllCandidatesSubmissionsForSession.bind(
+		assignmentController
+	)
+);
 export default assignmentRouter;
 export {
 	assignmentController,

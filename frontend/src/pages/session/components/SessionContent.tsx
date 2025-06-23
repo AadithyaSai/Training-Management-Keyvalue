@@ -1,118 +1,105 @@
-import Button, { ButtonType } from "../../../components/button/Button";
-import { UserRoleType, type SessionData, type UserRole } from "./sessionTypes";
+import type { SessionData } from "./sessionTypes";
 
 interface SessionContentProps {
-    isAdmin?: boolean;
-    sessionData: SessionData;
-    isTrainerAssignable?: boolean;
-    isModeratorAssignable?: boolean;
-    handleEnrollSelf? : (role: UserRole) => void;
+	isAdmin?: boolean;
+	sessionData: SessionData;
 }
 
 export const SessionContent: React.FC<SessionContentProps> = ({
-    isAdmin = false,
-    sessionData,
-    isTrainerAssignable = false,
-    isModeratorAssignable = false,
-    handleEnrollSelf
+	isAdmin = false,
+	sessionData,
 }) => {
+	return (
+		<>
+			{/* Trainer Section */}
+			<div className="border-b border-gray-600 pb-4">
+				<h3 className="text-gray-400 text-sm mb-2">Trainer</h3>
+				<h2 className="text-xl font-medium">
+					{sessionData.trainer?.name}
+				</h2>
+			</div>
 
+			{/* Moderators Section */}
+			<div className="border-b border-gray-600 pb-4">
+				<h3 className="text-gray-400 text-sm mb-2">Moderators</h3>
+				<div className="space-y-1">
+					{sessionData.moderators?.map((moderator, index) => (
+						<p key={index} className="text-lg">
+							{moderator.name}
+						</p>
+					))}
+				</div>
+			</div>
 
+			{/* Session Description */}
+			<div className="border-b border-gray-600 pb-4">
+				<h3 className="text-gray-400 text-sm mb-2">
+					Session Description
+				</h3>
+				<p className="text-gray-300 leading-relaxed">
+					{sessionData.description || "Desc"}
+				</p>
+			</div>
 
-    return (
-        <>
-            {/* Trainer Section */}
-            <div className="border-b border-gray-600 pb-4 flex justify-between">
-                <div>
-                    <h3 className="text-gray-400 text-sm mb-2">Trainer</h3>
-                    {sessionData.trainer ? (
-                        <h2 className="text-xl font-medium">
-                            {sessionData.trainer.name}
-                        </h2>
-                    ) : (
-                        <p className="text-md text-gray-300">
-                            No trainer present
-                        </p>
-                    )}
-                </div>
-                {isTrainerAssignable && (
-                    <Button
-                        variant={ButtonType.SECONDARY}
-                        className="px-6 py-3 cursor-pointer"
-                        onClick={() => handleEnrollSelf && handleEnrollSelf(UserRoleType.TRAINER)}
-                    >
-                        <p className="">Enroll as the trainer</p>
-                    </Button>
-                )}
-            </div>
+			{isAdmin && (
+				<>
+					{sessionData.materialQualityFeedback && (
+						<div className="border-b border-gray-600 pb-4">
+							<h3 className="text-gray-400 text-sm mb-2">
+								Material Quality
+							</h3>
+							<p className="text-gray-300 leading-relaxed">
+								{sessionData.materialQualityFeedback}
+							</p>
+						</div>
+					)}
+					{sessionData.sessionFeedback && (
+						<div className="border-b border-gray-600 pb-4">
+							<h3 className="text-gray-400 text-sm mb-2">
+								Summary of feedbacks
+							</h3>
+							<p className="text-gray-300 leading-relaxed">
+								{sessionData.sessionFeedback}
+							</p>
+						</div>
+					)}
+				</>
+			)}
+			{sessionData.assignments && sessionData.assignments.length > 0 && (
+				<details className="border-b border-gray-600 pb-4">
+					<summary className="cursor-pointer text-gray-400 text-sm mb-2 outline-none focus:ring-2 focus:ring-blue-400">
+						Assignments
+					</summary>
+					<div className="space-y-3 mt-2">
+						{sessionData.assignments.map((assignment, idx) => (
+							<div
+								key={idx}
+								className="bg-gray-800 rounded-md p-4 shadow border border-gray-700"
+							>
+								<h4 className="text-lg font-semibold text-white mb-1">
+									{assignment.title}
+								</h4>
+								<p className="text-gray-300 mb-2">
+									{assignment.description}
+								</p>
+								<p className="text-gray-400 text-sm">
+									<span className="font-medium">
+										Due Date:
+									</span>{" "}
+									{assignment.dueDate
+										? new Date(
+												assignment.dueDate
+										  ).toLocaleDateString()
+										: "N/A"}
+								</p>
+							</div>
+						))}
+					</div>
+				</details>
+			)}
 
-            {/* Moderators Section */}
-            <div className="border-b border-gray-600 pb-4 flex justify-between">
-                <div>
-                    <h3 className="text-gray-400 text-sm mb-2">Moderators</h3>
-                    {sessionData.moderators &&
-                    sessionData.moderators.length > 0 ? (
-                        <div className="space-y-1">
-                            {sessionData.moderators.map((moderator, index) => (
-                                <p key={index} className="text-lg">
-                                    {moderator.name}
-                                </p>
-                            ))}
-                        </div>
-                    ) : (
-                        <p className="text-md text-gray-300">
-                            No moderators present
-                        </p>
-                    )}
-                </div>
-                {isModeratorAssignable && (
-                    <Button
-                        variant={ButtonType.SECONDARY}
-                        className="py-3 cursor-pointer"
-                        onClick={() => handleEnrollSelf && handleEnrollSelf(UserRoleType.MODERATOR)}
-                    >
-                        <p className="">Enroll as a moderator</p>
-                    </Button>
-                )}
-            </div>
-
-            {/* Session Description */}
-            <div className="border-b border-gray-600 pb-4">
-                <h3 className="text-gray-400 text-sm mb-2">
-                    Session Description
-                </h3>
-                <p className="text-gray-300 leading-relaxed">
-                    {sessionData.description || "Desc"}
-                </p>
-            </div>
-
-            {isAdmin && (
-                <>
-                    {sessionData.materialQualityFeedback && (
-                        <div className="border-b border-gray-600 pb-4">
-                            <h3 className="text-gray-400 text-sm mb-2">
-                                Material Quality
-                            </h3>
-                            <p className="text-gray-300 leading-relaxed">
-                                {sessionData.materialQualityFeedback}
-                            </p>
-                        </div>
-                    )}
-                    {sessionData.sessionFeedback && (
-                        <div className="border-b border-gray-600 pb-4">
-                            <h3 className="text-gray-400 text-sm mb-2">
-                                Summary of feedbacks
-                            </h3>
-                            <p className="text-gray-300 leading-relaxed">
-                                {sessionData.sessionFeedback}
-                            </p>
-                        </div>
-                    )}
-                </>
-            )}
-
-            {/* Uploaded Materials (for all roles) */}
-            {/* {sessionData.materials && (
+			{/* Uploaded Materials (for all roles) */}
+			{/* {sessionData.materials && (
                 <div className="border-b border-gray-600 pb-4">
                     <h3 className="text-gray-400 text-sm mb-2">
                         Uploaded Materials
@@ -133,6 +120,6 @@ export const SessionContent: React.FC<SessionContentProps> = ({
                     </div>
                 </div>
             )} */}
-        </>
-    );
+		</>
+	);
 };

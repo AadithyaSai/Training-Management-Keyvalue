@@ -10,7 +10,7 @@ export class AssignmentRepository {
 	}
 
 	async getById(id: number): Promise<Assignment | null> {
-		return this.repository.findOne({ where: { id } });
+		return this.repository.findOne({ where: { id },relations:{session:true} });
 	}
 
 	async getAll(): Promise<Assignment[]> {
