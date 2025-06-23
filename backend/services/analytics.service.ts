@@ -8,114 +8,124 @@ import LoggerService from "./logger.service";
 import UserService from "./user.service";
 
 export default class AnalyticsService {
-  private logger = LoggerService.getInstance(AnalyticsService.name);
+	private logger = LoggerService.getInstance(AnalyticsService.name);
 
-  constructor(private userService: UserService) {}
+	constructor(private userService: UserService) {}
 
-  async getUserCount() {
-    return await this.userService.countUsers();
-  }
+	async getUserCount() {
+		return await this.userService.countUsers();
+	}
 
-  async getOverallAnalytics(): Promise<OverallAnalytics> {
-    throw new Error("Method not implemented.");
-  }
+	async getOverallAnalytics(): Promise<OverallAnalytics> {
+		throw new Error("Method not implemented.");
+	}
 
-  async getUserAnalytics(userId: number): Promise<UserAnalytics> {
-    const user = await this.userService.findOneById(userId);
-    if (!user) {
-      throw new HTTPException(404, "User not found");
-    }
-    const today = new Date();
-    const totalPrograms = await trainingService.getProgramsByUserId(userId);
-    const totalSessions = await sessionService.getSessionsByUserId(userId);
+	async getUserAnalytics(userId: number): Promise<UserAnalytics> {
+		const user = await this.userService.findOneById(userId);
+		if (!user) {
+			throw new HTTPException(404, "User not found");
+		}
+		const today = new Date();
+		const totalPrograms = await trainingService.getProgramsByUserId(userId);
+		const totalSessions = await sessionService.getSessionsByUserId(userId);
 
-    const completedPrograms = totalPrograms.filter((program) => {
-      new Date(program.endDate) < today;
-    });
-    const activePrograms = totalPrograms.filter((program) => {
-      return (
-        new Date(program.startDate) <= today &&
-        new Date(program.endDate) >= today
-      );
-    });
-    const todaysSessions = totalSessions.filter((session) => {
-      return (
-        new Date(session.date) === today &&
-        session.status === (Status.Scheduled || Status.InProgress)
-      );
-    });
-    const upcomingPrograms = totalPrograms.filter((program) => {
-      return new Date(program.startDate) >= today;
-    });
-    const upcomingSessions = totalSessions.filter((session) => {
-      return (
-        new Date(session.date) >= today &&
-        session.status === (Status.Scheduled || Status.InProgress)
-      );
-    });
-    return {
-      ...user,
-      totalPrograms: totalPrograms,
-      totalSessions: totalSessions,
-      activePrograms: activePrograms,
-      todaysSessions: todaysSessions,
-      upcomingSessions: upcomingSessions,
-      upcomingPrograms: upcomingPrograms,
-      completedPrograms: completedPrograms,
-    };
-  }
+		const completedPrograms = totalPrograms.filter((program) => {
+			new Date(program.endDate) < today;
+		});
+		const activePrograms = totalPrograms.filter((program) => {
+			return (
+				new Date(program.startDate) <= today &&
+				new Date(program.endDate) >= today
+			);
+		});
+		const todaysSessions = totalSessions.filter((session) => {
+			return (
+				new Date(session.date) === today &&
+				session.status === (Status.Scheduled || Status.InProgress)
+			);
+		});
+		const upcomingPrograms = totalPrograms.filter((program) => {
+			return new Date(program.startDate) >= today;
+		});
+		const upcomingSessions = totalSessions.filter((session) => {
+			return (
+				new Date(session.date) >= today &&
+				session.status === (Status.Scheduled || Status.InProgress)
+			);
+		});
+		return {
+			...user,
+			totalPrograms: totalPrograms,
+			totalSessions: totalSessions,
+			activePrograms: activePrograms,
+			todaysSessions: todaysSessions,
+			upcomingSessions: upcomingSessions,
+			upcomingPrograms: upcomingPrograms,
+			completedPrograms: completedPrograms,
+		};
+	}
 
-  async getSingleProgramAnalytics(programId: number) {
-    const program = await trainingService.getTrainingById(programId);
-    const totalSessions = program.sessions;
-    const today = new Date();
-    const upcomingSessions = totalSessions.filter((session) => {
-      return (
-        new Date(session.date) >= today &&
-        session.status === (Status.Scheduled || Status.InProgress)
-      );
-    });
-    const progress =
-      totalSessions.length -
-      (upcomingSessions.length / totalSessions.length) * 100;
-    return {
-      program,
-      totalSessionCount: totalSessions.length,
-      upcomingSessionsCount: upcomingSessions.length,
-      totalAttendees: program.members.filter(
-        (member) => member.role === Role.CANDIDATE
-      ).length,
-      progress: progress,
-    };
-  }
+	async getSingleProgramAnalytics(programId: number) {
+		const program = await trainingService.getTrainingById(programId);
+		const totalSessions = program.sessions;
+		const today = new Date();
+		const upcomingSessions = totalSessions.filter((session) => {
+			return (
+				new Date(session.date) >= today &&
+				session.status === (Status.Scheduled || Status.InProgress)
+			);
+		});
+		const todaysSession = totalSessions.filter((session) => {
+			return (
+				new Date(session.date).toDateString() ===
+					today.toDateString() &&
+				(session.status === Status.Scheduled ||
+					session.status === Status.InProgress)
+			);
+		});
+		const progress =
+			((totalSessions.length - upcomingSessions.length) /
+				totalSessions.length) *
+			100;
+		return {
+			program,
+			totalSessionCount: totalSessions.length,
+			upcomingSessionsCount: upcomingSessions.length,
+			totalAttendees: program.members.filter(
+				(member) => member.role === Role.CANDIDATE
+			).length,
+			progress: progress,
+			todaysSessionsCount: todaysSession.length,
+		};
+	}
 
-  async exportUserList(): Promise<Buffer> {
-    const userList = await this.userService.findAllUsers();
+	async exportUserList(): Promise<Buffer> {
+		const userList = await this.userService.findAllUsers();
 
-    const csvHeader = "ID,Username,Email,IsAdmin\n";
+		const csvHeader = "ID,Username,Email,IsAdmin\n";
 
-    const csvContent = userList
-      .map((user) => {
-        return `${user.id},${user.username},${user.email},${user.isAdmin}`;
-      })
-      .join("\n");
+		const csvContent = userList
+			.map((user) => {
+				return `${user.id},${user.username},${user.email},${user.isAdmin}`;
+			})
+			.join("\n");
 
-    return Buffer.from(csvHeader + csvContent, "utf-8");
-  }
+		return Buffer.from(csvHeader + csvContent, "utf-8");
+	}
 
-  async exportProgramList(): Promise<Buffer> {
-    throw new Error("Method not implemented.");
-  }
+	async exportProgramList(): Promise<Buffer> {
+		throw new Error("Method not implemented.");
+	}
 
-  async exportSingleProgram(programId: number): Promise<Buffer> {
-    throw new Error("Method not implemented.");
-  }
+	async exportSingleProgram(programId: number): Promise<Buffer> {
+		throw new Error("Method not implemented.");
+	}
 
-  async exportSessionList(): Promise<Buffer> {
-    throw new Error("Method not implemented.");
-  }
+	async exportSessionList(): Promise<Buffer> {
+		throw new Error("Method not implemented.");
+	}
 
-  async exportSingleSession(sessionId: number): Promise<Buffer> {
-    throw new Error("Method not implemented.");
-  }
+	async exportSingleSession(sessionId: number): Promise<Buffer> {
+		throw new Error("Method not implemented.");
+	}
 }

@@ -112,9 +112,11 @@ export default class AssignmentController {
 				AssignmentSubmissionDto,
 				req.body
 			);
+			console.log("Yesssssssssssssssssssssss");
 			if (req.file) {
+				console.log("Noooooooooooooooooooooooooooooo");
 				submissionData.file = await uploadFile(req.file, "assignments");
-				submissionData.completionLink = submissionData.file; // Assuming completionLink is the same as file
+				submissionData.completionLink = submissionData.file || "trial"; // Assuming completionLink is the same as file
 			}
 			const errors = await validate(submissionData);
 			if (errors.length > 0) {

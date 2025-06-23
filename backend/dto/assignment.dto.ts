@@ -56,7 +56,7 @@ export class AssignmentSubmissionDto {
 	@IsOptional()
 	completionLink: string;
 
-	@IsUrl()
+	// @IsUrl()
 	@IsOptional()
 	file: string;
 }
