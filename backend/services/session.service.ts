@@ -238,16 +238,14 @@ export class SessionService {
 			Session,
 			instanceToPlain(sessionDto)
 		);
-		sessionData.training = await this.trainingService.getTrainingById(
-			sessionDto.programId
-		);
-		const training = await this.trainingService.getTrainingById(
-			sessionDto.programId
-		);
-		if (training) {
+		if (sessionDto.programId) {
+			const training = await this.trainingService.getTrainingById(
+				sessionDto.programId
+			);
+			if (!training) {
+				throw new HTTPException(400, "No such training");
+			}
 			sessionData.training = training;
-		} else {
-			throw new HTTPException(400, "No such training");
 		}
 		const result = await this.sessionRepository.update(id, sessionData);
 		this.logger.info(`Session updated with ID: ${result.id}`);

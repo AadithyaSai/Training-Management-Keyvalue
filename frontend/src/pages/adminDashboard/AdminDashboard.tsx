@@ -37,7 +37,6 @@ const AdminDashboard = () => {
 			100
 		).toFixed(0)
 	);
-
 	return (
 		<Layout
 			title="Admin Dashboard"
@@ -48,7 +47,7 @@ const AdminDashboard = () => {
 					data={[
 						{
 							label: "Total Programs",
-							value: trainingList?.length,
+							value: userDashboardData?.totalPrograms.length,
 						},
 						{
 							label: "Todays Session",
