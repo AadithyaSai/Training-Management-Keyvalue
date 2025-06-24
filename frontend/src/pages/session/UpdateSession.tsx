@@ -403,7 +403,7 @@ const UpdateSession = () => {
 
   const navigate = useNavigate();
   const { trainingId, sessionId } = useParams();
-  const { data: sessionDetailsData, getIsLoading } = useGetSessionByIdQuery({
+  const { data: sessionDetailsData, isLoading: getIsLoading } = useGetSessionByIdQuery({
     id: sessionId,
   });
 
@@ -412,12 +412,16 @@ const UpdateSession = () => {
   const { data: trainingDetailsData } = useGetTrainingByIdQuery({
     id: parseInt(trainingId || "0", 10),
   });
-  const trainers = trainingDetailsData?.members
-    .filter((u) => u.role === "trainer")
-    .map((u) => u.user);
-  const moderators = trainingDetailsData?.members
-    .filter((u) => u.role === "moderator")
-    .map((u) => u.user);
+
+  const [trainers, setTrainers] = useState([]);
+  const [moderators, setModerators] = useState([]);
+
+  useEffect(() => {
+    if (trainingDetailsData) {
+      setTrainers(trainingDetailsData.members.filter((m)=>m.role==="trainer").map((m)=>m.user) || []);
+      setModerators(trainingDetailsData.members.filter((m)=>m.role==="moderator").map((m)=>m.user) || []);
+    }
+  }, [trainingDetailsData]);
 
   useEffect(() => {
     if (sessionDetailsData) {
@@ -460,7 +464,7 @@ const UpdateSession = () => {
     }
 
     setErrors({});
-    updateSession({ id: sessionId, data: sessionDetails })
+    updateSession({ id: sessionId, data: {...sessionDetails, programId: parseInt(trainingId!)} })
       .unwrap()
       .then(() => navigate(`/training/${trainingId}`))
       .catch((error) => console.error(error));
