@@ -5,9 +5,9 @@ import React, {
     useEffect,
 } from "react";
 import { useParams } from "react-router-dom";
-import { useGetSessionByIdQuery } from "../../../../api-service/session/session.api";
-import { useCreateMaterialMutation } from "../../../../api-service/uploadMaterial/uploadMaterial.api";
-import Button, { ButtonType } from "../../../../components/button/Button";
+import { useGetSessionByIdQuery } from "../../api-service/session/session.api";
+import { useCreateMaterialMutation } from "../../api-service/uploadMaterial/uploadMaterial.api";
+import Button, { ButtonType } from "../button/Button";
 
 interface UploadMaterialsModalProps {
     isOpen: boolean;
@@ -124,7 +124,6 @@ export const UploadMaterialsModal: React.FC<UploadMaterialsModalProps> = ({
                   <Button
                         variant={ButtonType.PRIMARY}
                         onClick={handleUpload}
-                        // className="px-4 py-2 text-sm rounded-md border border-white hover:bg-white hover:text-black transition disabled:opacity-50"
                         disabled={files.length === 0}
                     >
                         Upload
@@ -132,7 +131,6 @@ export const UploadMaterialsModal: React.FC<UploadMaterialsModalProps> = ({
                     <Button
                         variant={ButtonType.SECONDARY}
                         onClick={onClose}
-                        // className="px-4 py-2 text-sm rounded-md bg-white text-black hover:bg-gray-300 transition"
                     >
                         Cancel
                     </Button>

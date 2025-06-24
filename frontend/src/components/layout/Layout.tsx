@@ -1,16 +1,49 @@
-import { PacmanLoader } from "react-spinners";
 import Header from "../header/Header";
 import Navbar from "../navbar/Navbar";
 import { ToastContainer } from "react-toastify";
 import type { UserRole } from "../../pages/session/components/sessionTypes";
+import Pacman, { PacmanFullScreen } from "../loader/Pacman";
+import { useSelector } from "react-redux";
+import {
+    getUserDetails,
+    type UserStateData,
+} from "../../store/slices/userSlice";
+import { jwtDecode } from "jwt-decode";
+import { useNavigate } from "react-router-dom";
 
 interface LayoutProps {
     title?: string;
     children?: React.ReactNode;
     endAdornments?: React.ReactNode;
     isLoading?: boolean;
+    calendarNav?: boolean;
     userRole?: UserRole;
 }
+
+const validateToken = () => {
+    const token = localStorage.getItem("token");
+    if (!token) return { status: false };
+    const {
+        id: tokenUserId,
+        isAdmin: isAdminToken,
+    }: { id: number; isAdmin: boolean } = jwtDecode(token);
+    const userDetails: UserStateData = useSelector(getUserDetails);
+
+    if (tokenUserId !== userDetails.id) return { status: false };
+    else if (isAdminToken === false || userDetails.isAdmin == false)
+        return {
+            status: false,
+            data: {
+                ...userDetails,
+                isAdmin: false,
+            },
+        };
+    else
+        return {
+            status: true,
+            data: userDetails,
+        };
+};
 
 const LightEffect = () => {
     return (
@@ -30,29 +63,34 @@ const Layout: React.FC<LayoutProps> = ({
     title,
     children,
     endAdornments,
+    calendarNav,
     isLoading,
-    userRole,
 }) => {
+    const navigate = useNavigate();
+    const userDetails = validateToken();
+
+
+    if (!userDetails) {
+        return <PacmanFullScreen />;
+    }
+    
+    if (!userDetails.data) {
+        navigate("/login");
+    }
+
     return (
         <div className="flex flex-col min-h-screen bg-bgColor">
             <ToastContainer toastClassName="custom-toast" />
             <Header title={title} endAdornments={endAdornments} />
-            <Navbar userRole={userRole}/>
-            <div className="flex mt-headerHeight">
-                <div className="w-full h-bodyHeight relative ml-navbarWidth">
+            <Navbar userDetails={userDetails.data} calendarNav={calendarNav}/>
+            <div className="flex mt-headerHeight h-bodyHeight">
+                <div className="w-full relative ml-navbarWidth">
                     <LightEffect />
                     <main className="p-6 overflow-y-auto w-full h-full relative z-10">
-                        {isLoading ? (
-                            <div className="flex items-center justify-center w-full h-full">
-                                <PacmanLoader color="#fff" size={30}/>
-                            </div>
-                        ) : (
-                            children
-                        )}
+                        {isLoading ? <Pacman /> : children}
                     </main>
                 </div>
             </div>
-            {/* <Popup isOpen={true} popup={popup} /> */}
         </div>
     );
 };

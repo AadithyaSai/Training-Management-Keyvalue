@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { useCreateFeedbackMutation } from "../../../../api-service/feedback/feedback.api";
-import { UserRoleType, type UserRole } from "../sessionTypes";
-import { jwtDecode } from "jwt-decode";
-import Button, { ButtonType } from "../../../../components/button/Button";
+import { useCreateFeedbackMutation } from "../../api-service/feedback/feedback.api";
+import { UserRoleType, type UserRole } from "../../pages/session/components/sessionTypes";
+import Button, { ButtonType } from "../button/Button";
 import type { CandidateData } from "./CandidateListModal";
+import { useSelector } from "react-redux";
+import { getUserDetails } from "../../store/slices/userSlice";
 
 interface FeedbackModalProps {
     sessionId: number;
@@ -28,11 +29,9 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
 
     const [createFeedback] = useCreateFeedbackMutation();
 
+    const userId = useSelector(getUserDetails).id;
     if (!isOpen) return null;
 
-    const token = localStorage.getItem("token");
-    const decoded: { id: number } = jwtDecode(token || "");
-    const userId = decoded.id;
 
     const handleSubmit = () => {
         const isCandidate: boolean = userRole == UserRoleType.CANDIDATE;

@@ -1,7 +1,7 @@
 
 import { useGetUserDashboardDataQuery } from "../../api-service/user/user.api";
 import DashboardCardList from "../../components/dashboardCardList/DashboardCardList";
-import EventList, { formatTrainingList } from "../../components/eventList/EventList";
+import EventList, { EventListType, formatTrainingList } from "../../components/eventList/EventList";
 import Layout from "../../components/layout/Layout";
 import { useParams } from "react-router-dom";
 
@@ -11,11 +11,11 @@ const CommonDashboard = () => {
         { id: userId }
     );
     const progress: number =
-        Number(((userDashboardData?.upcomingPrograms.length /
+        Number((((userDashboardData?.totalPrograms.length - userDashboardData?.upcomingPrograms.length) /
             userDashboardData?.totalPrograms.length) *
         100).toFixed(0));
     return (
-        <Layout title="Dashboard" isLoading={isLoading}>
+        <Layout title="Dashboard" isLoading={isLoading} calendarNav={false}>
             <div className="flex flex-col items-center justify-center gap-10 p-5">
                 <DashboardCardList
                     data={[
@@ -25,15 +25,15 @@ const CommonDashboard = () => {
                         },
                         {
                             label: "Todays Session",
-                            value: userDashboardData?.todaysSessions.length + 3,
+                            value: userDashboardData?.todaysSessions.length,
                         },
                         {
                             label: "Completed Programs",
-                            value: userDashboardData?.completedPrograms.length + 4,
+                            value: userDashboardData?.completedPrograms.length,
                         },
                         {
                             label: "Upcoming Sessions",
-                            value: userDashboardData?.upcomingSessions.length + 2,
+                            value: userDashboardData?.upcomingSessions.length ,
                         },
                         {
                             label: "Program Stats",
@@ -44,7 +44,7 @@ const CommonDashboard = () => {
                 />
                 <EventList
                     isAdmin={false}
-                    heading="Trainings"
+                    eventType={EventListType.TRAINING}
                     showCreateButton={false}
                     data={formatTrainingList(userDashboardData?.totalPrograms)}
                 />

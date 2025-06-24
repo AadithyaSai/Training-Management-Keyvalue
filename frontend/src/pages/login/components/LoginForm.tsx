@@ -6,7 +6,10 @@ import Button, { ButtonType } from "../../../components/button/Button";
 import { toast } from "react-toastify";
 
 import { jwtDecode } from "jwt-decode";
-
+import { useDispatch } from "react-redux";
+import { setUser } from "../../../store/slices/userSlice";
+import Pacman from "../../../components/loader/Pacman";
+import { useCreateUserMutation } from "../../../api-service/user/user.api";
 
 type SliderPosition = "left" | "right";
 
@@ -96,9 +99,10 @@ const LoginForm = () => {
         password: "",
     });
 
-    const [login] = useLoginMutation();
-
+    const dispatch = useDispatch();
     const navigate = useNavigate();
+    const [login, { isLoading }] = useLoginMutation();
+    const [createUser, { isLoading: isCreatingUser }] = useCreateUserMutation();
 
     const handleLogin = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -107,28 +111,58 @@ const LoginForm = () => {
             .then((data) => {
                 localStorage.setItem("token", data.accessToken);
                 setSigninData({ username: "", password: "" });
-
-                const decoded: { id: number; isAdmin: boolean } = jwtDecode(
-                    data.accessToken
+                const decodedToken: { id: number; isAdmin: boolean } =
+                    jwtDecode(data.accessToken);
+                const { isAdmin, id: userId } = decodedToken;
+                dispatch(
+                    setUser({
+                        id: userId,
+                        username: signinData.username,
+                        isAdmin,
+                    })
                 );
-                const isAdmin = decoded.isAdmin; 
-
+                console.log("Details", { id: userId, isAdmin });
                 if (isAdmin) {
-                    navigate(`/adminDashboard/${decoded.id}`);
+                    navigate(`/adminDashboard/${userId}`);
                 } else {
-                    navigate(`/dashboard/${decoded.id}`);
+                    navigate(`/dashboard/${userId}`);
                 }
-
             })
             .catch((error) => {
                 setSigninData({ username: "", password: "" });
-                toast.error(`Error: ${error.data.error || "Something went wrong"}`,  { autoClose: 2000 });
+                toast.error(
+                    `Error: ${error.data.error || "Something went wrong"}`,
+                    { autoClose: 2000 }
+                );
             });
     };
 
+    const handleRegister = (event: FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        createUser({
+            name: signupData.name,
+            username: signupData.name,
+            email: signupData.email,
+            password: signupData.password,
+        })
+            .unwrap()
+            .then((data) => {
+                console.log(`User details : ${data}`);
+            })
+            .catch((error) => {
+                setSignupData({ name: "", email: "", password: "" });
+                toast.error(
+                    `Error: ${error.data.error || "Something went wrong"}`,
+                    { autoClose: 2000 }
+                );
+            });
+    };
+
+    if (isLoading || isCreatingUser) return <Pacman />;
+
     return (
         <div className="flex items-center justify-center w-[750px] h-[500px] bg-[rgba(0, 0, 0, 0.2)] backdrop-blur-xl rounded-md shadow-md overflow-hidden relative border border-borderColor">
-            <LoginFormSection type="signup">
+            <LoginFormSection type="signup" onSubmit={handleRegister}>
                 <LoginInput
                     name="name"
                     id="name"

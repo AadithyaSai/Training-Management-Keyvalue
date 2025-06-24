@@ -16,7 +16,7 @@ const ViewAssignmentsModal: React.FC<AssignmentsModalProps> = ({
   if (!isOpen) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
-      <div className="bg-[#1C1C1C] text-white rounded-lg border border-gray-400 w-[500px] max-h-[80vh] p-4">
+      <div className="bg-[#1C1C1C] text-white rounded-lg border border-borderColor w-[500px] max-h-[80vh] p-4">
         {/* Header */}
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold">ASSIGNMENTS</h2>
@@ -28,7 +28,7 @@ const ViewAssignmentsModal: React.FC<AssignmentsModalProps> = ({
           </button>
         </div>
         {/* Scrollable Assignment List */}
-        <div className="border border-gray-400 p-3 h-[250px] overflow-y-auto space-y-2">
+        <div className="border border-borderColor h-[250px] overflow-y-auto">
           {assignments && assignments.length > 0 ? (
             assignments.map((assignment) => (
               <a
@@ -36,7 +36,7 @@ const ViewAssignmentsModal: React.FC<AssignmentsModalProps> = ({
                 href={assignment.completionLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="block text-sm text-blue-400 hover:underline truncate"
+                className="w-full block p-3 text-sm text-white truncate border border-borderColor hover:bg-[#2c2c2c] transition-all duration-300"
               >
                 {assignment.completionLink}
               </a>

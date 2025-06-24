@@ -114,7 +114,7 @@ export default class AssignmentController {
 			);
 			if (req.file) {
 				submissionData.file = await uploadFile(req.file, "assignments");
-				submissionData.completionLink = submissionData.file; // Assuming completionLink is the same as file
+				submissionData.completionLink = submissionData.file || "trial"; // Assuming completionLink is the same as file
 			}
 			const errors = await validate(submissionData);
 			if (errors.length > 0) {
@@ -147,6 +147,17 @@ export default class AssignmentController {
 				await this.assignmentService.getSubmissionsByAssignmentId(
 					assignmentId
 				);
+
+			res.status(200).json(submissions);
+		} catch (error) {
+			next(error);
+		}
+	}
+	async getAllCandidatesSubmissionsForSession(req: Request, res: Response, next: NextFunction) {
+		try {
+			const sessionId = parseInt(req.params.id, 10);
+
+			const submissions = await this.assignmentService.getAllCandidatesSubmissionsForSession(sessionId);
 
 			res.status(200).json(submissions);
 		} catch (error) {

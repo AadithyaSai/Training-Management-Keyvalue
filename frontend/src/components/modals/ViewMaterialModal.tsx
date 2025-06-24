@@ -20,7 +20,7 @@ const MaterialsModal: React.FC<MaterialsModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
-      <div className="bg-[#1c1c1c] text-white rounded-lg border border-gray-400 w-[500px] max-h-[80vh] p-4">
+      <div className="bg-[#1c1c1c] text-white rounded-lg border border-borderColor w-[500px] max-h-[80vh] p-4">
         {/* Header */}
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold">MATERIALS</h2>
@@ -33,7 +33,7 @@ const MaterialsModal: React.FC<MaterialsModalProps> = ({
         </div>
 
         {/* Scrollable Material List */}
-        <div className="border border-gray-400 p-3 h-[250px] overflow-y-auto space-y-2">
+        <div className="border border-borderColor h-[250px] overflow-y-auto rounded-sm">
           {materials && materials.length > 0 ? (
             materials.map((material) => (
               <a
@@ -41,7 +41,7 @@ const MaterialsModal: React.FC<MaterialsModalProps> = ({
                 href={material.link}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="block text-sm text-blue-400 hover:underline truncate"
+                className="w-full block p-3 text-sm text-white truncate border border-borderColor hover:bg-[#2c2c2c] transition-all duration-300"
               >
                 {material.link}
               </a>

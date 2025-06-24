@@ -2,19 +2,28 @@ import ActionButton from "../../components/actionButton/ActionButton";
 import Button, { ButtonType } from "../../components/button/Button";
 import Layout from "../../components/layout/Layout";
 import FormInput from "../../components/formInput/FormInput";
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCreateTrainingMutation } from "../../api-service/training/training.api";
+import { useDispatch, useSelector } from "react-redux";
+import { getUserDetails } from "../../store/slices/userSlice";
 import {
-    UserRoleType,
-    type UserRole,
-} from "../session/components/sessionTypes";
-import CreateUserPool from "../createUserPool/CreateUserPool";
-import { jwtDecode } from "jwt-decode";
+    addTrainingDetails,
+    clearTrainingDetails,
+    getTrainingDetails,
+    type TrainingSliceState,
+} from "../../store/slices/trainingSlice";
+import {
+    PoolUserRoleType,
+    type PoolUserRole,
+} from "../createUserPool/CreateUserPool";
+import type { User } from "../../api-service/users/user.type";
+
 export interface UserPoolData {
     userId: number;
     role: string;
 }
+
 export interface TrainingDetailsData {
     title: string;
     description: string;
@@ -22,176 +31,191 @@ export interface TrainingDetailsData {
     endDate: string;
     members: Array<UserPoolData>;
 }
-const CreateTraining = () => {
-    const [displayedPoolType, setDisplayedPoolType] = useState<UserRole | null>(
-        null
-    );
-    const [trainingDetails, setTrainingDetails] = useState<TrainingDetailsData>(
-        {
-            title: "",
-            description: "",
-            startDate: "",
-            endDate: "",
-            members: [],
-        }
-    );
-    const [trainerPool, setTrainerPool] = useState<Array<UserPoolData>>([]);
-    const [moderatorPool, setModeratorPool] = useState<Array<UserPoolData>>([]);
-    const [candidatePool, setCandidatePool] = useState<Array<UserPoolData>>([]);
 
-    // useEffect(() => {
-    //     setTrainingDetails({ ...trainingDetails, members: [...trainerPool, ...moderatorPool, ...candidatePool] })
-    // }, [trainerPool, moderatorPool, candidatePool]);
+const formatUserData = (userList: Array<User>, role: PoolUserRole) => {
+    const formattdUserList: Array<UserPoolData> = userList.map((user) => ({
+        userId: user.id,
+        role: role.toLowerCase(),
+    }));
+    return formattdUserList;
+};
+
+export const formatTrainingDetails = (trainingDetails: TrainingSliceState) => {
+    const formattedTrainingDetails: TrainingDetailsData = {
+        ...trainingDetails,
+        members: [
+            ...formatUserData(
+                trainingDetails.members.trainers,
+                PoolUserRoleType.TRAINER
+            ),
+            ...formatUserData(
+                trainingDetails.members.moderators,
+                PoolUserRoleType.MODERATOR
+            ),
+            ...formatUserData(
+                trainingDetails.members.candidates,
+                PoolUserRoleType.CANDIDATE
+            ),
+        ],
+    };
+    return formattedTrainingDetails;
+};
+
+const CreateTraining = () => {
+    const storedTrainingDetails: TrainingSliceState =
+        useSelector(getTrainingDetails);
+    const [trainingDetails, setTrainingDetails] = useState<TrainingSliceState>({
+        title: "",
+        description: "",
+        startDate: "",
+        endDate: "",
+        members: {
+            trainers: [],
+            moderators: [],
+            candidates: [],
+        },
+    });
+
+    useEffect(() => {
+        if (!storedTrainingDetails) return;
+        setTrainingDetails({
+            ...storedTrainingDetails,
+            members: {
+                trainers: [...storedTrainingDetails.members.trainers],
+                moderators: [...storedTrainingDetails.members.moderators],
+                candidates: [...storedTrainingDetails.members.candidates],
+            },
+        });
+    }, [storedTrainingDetails]);
 
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     const [createTraining, { isLoading }] = useCreateTrainingMutation();
 
-    const token = localStorage.getItem("token");
-    const decoded: { id: number } = jwtDecode(token || "");
-    const userId = decoded.id;
+    const userId = useSelector(getUserDetails).id;
 
     const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        createTraining(trainingDetails)
+        createTraining(formatTrainingDetails(trainingDetails))
             .unwrap()
             .then(() => {
+                dispatch(clearTrainingDetails());
                 navigate(`/adminDashboard/${userId}`);
             })
             .catch((error) => {
                 console.log(error);
             });
     };
-    const addWindowListener = () => {
-        if (!displayedPoolType) return;
-        setDisplayedPoolType(null);
-        navigate("/training/create");
+
+    const handlePoolOpen = (role: PoolUserRole) => {
+        const urlRole = role.toLowerCase();
+        dispatch(addTrainingDetails(trainingDetails));
+        navigate(`/training/create/createPool/${urlRole}`);
     };
-    window.addEventListener("popstate", addWindowListener);
-    switch (displayedPoolType) {
-        case UserRoleType.TRAINER:
-            return (
-                <CreateUserPool
-                    role={UserRoleType.TRAINER}
-                    pool={trainerPool}
-                    setPool={setTrainerPool}
-                    setPoolType={setDisplayedPoolType}
-                    initialValues={trainerPool}
+
+    return (
+        <Layout title="Create Training" isLoading={isLoading}>
+            <form
+                onSubmit={handleSubmit}
+                className="flex flex-col w-full gap-6 mb-6 bg-cardColor border border-borderColor p-4 rounded"
+            >
+                <FormInput
+                    name="training-title"
+                    label="Training Title"
+                    value={trainingDetails.title}
+                    onChange={(event) =>
+                        setTrainingDetails({
+                            ...trainingDetails,
+                            title: event.target.value,
+                        })
+                    }
                 />
-            );
-        case UserRoleType.MODERATOR:
-            return (
-                <CreateUserPool
-                    role={UserRoleType.MODERATOR}
-                    pool={moderatorPool}
-                    setPool={setModeratorPool}
-                    setPoolType={setDisplayedPoolType}
-                    initialValues={moderatorPool}
+                <FormInput
+                    name="training-description"
+                    label="Training Description"
+                    type="textarea"
+                    value={trainingDetails.description}
+                    onChange={(event) =>
+                        setTrainingDetails({
+                            ...trainingDetails,
+                            description: event.target.value,
+                        })
+                    }
                 />
-            );
-        case UserRoleType.CANDIDATE:
-            return (
-                <CreateUserPool
-                    role={UserRoleType.CANDIDATE}
-                    pool={candidatePool}
-                    setPool={setCandidatePool}
-                    setPoolType={setDisplayedPoolType}
-                    initialValues={candidatePool}
+                <FormInput
+                    name="training-start-date"
+                    label="Training Start Date"
+                    type="date"
+                    value={trainingDetails.startDate}
+                    onChange={(event) =>
+                        setTrainingDetails({
+                            ...trainingDetails,
+                            startDate: event.target.value,
+                        })
+                    }
                 />
-            );
-        default:
-            return (
-                <Layout title="Create Training" isLoading={isLoading}>
-                    <form
-                        onSubmit={handleSubmit}
-                        className="flex flex-col w-full gap-6 mb-6 bg-cardColor border border-borderColor p-4 rounded"
+                <FormInput
+                    name="training-end-date"
+                    label="Training End Date"
+                    type="date"
+                    value={trainingDetails.endDate}
+                    onChange={(event) =>
+                        setTrainingDetails({
+                            ...trainingDetails,
+                            endDate: event.target.value,
+                        })
+                    }
+                />
+                <div className="flex flex-col gap-3">
+                    <ActionButton
+                        label="Add Trainer to Pool"
+                        onClick={() => handlePoolOpen(PoolUserRoleType.TRAINER)}
+                        endAdornment={
+                            <span>
+                                ({trainingDetails.members.trainers.length}{" "}
+                                added)
+                            </span>
+                        }
+                    />
+                    <ActionButton
+                        label="Add Moderators to Pool"
+                        onClick={() =>
+                            handlePoolOpen(PoolUserRoleType.MODERATOR)
+                        }
+                        endAdornment={
+                            <span>
+                                ({trainingDetails.members.moderators.length}{" "}
+                                added)
+                            </span>
+                        }
+                    />
+                    <ActionButton
+                        label="Add Candidates to Pool"
+                        onClick={() =>
+                            handlePoolOpen(PoolUserRoleType.CANDIDATE)
+                        }
+                        endAdornment={
+                            <span>
+                                ({trainingDetails.members.candidates.length}{" "}
+                                added)
+                            </span>
+                        }
+                    />
+                </div>
+                <div className="flex justify-end gap-4">
+                    <Button variant={ButtonType.PRIMARY} type="submit">
+                        Submit
+                    </Button>
+                    <Button
+                        variant={ButtonType.SECONDARY}
+                        onClick={() => navigate(`/adminDashboard/${userId}`)}
                     >
-                        <FormInput
-                            name="training-title"
-                            label="Training Title"
-                            value={trainingDetails.title}
-                            onChange={(event) =>
-                                setTrainingDetails({
-                                    ...trainingDetails,
-                                    title: event.target.value,
-                                })
-                            }
-                        />
-                        <FormInput
-                            name="training-description"
-                            label="Training Description"
-                            type="textarea"
-                            value={trainingDetails.description}
-                            onChange={(event) =>
-                                setTrainingDetails({
-                                    ...trainingDetails,
-                                    description: event.target.value,
-                                })
-                            }
-                        />
-                        <FormInput
-                            name="training-start-date"
-                            label="Training Start Date"
-                            type="date"
-                            value={trainingDetails.startDate}
-                            onChange={(event) =>
-                                setTrainingDetails({
-                                    ...trainingDetails,
-                                    startDate: event.target.value,
-                                })
-                            }
-                        />
-                        <FormInput
-                            name="training-end-date"
-                            label="Training End Date"
-                            type="date"
-                            value={trainingDetails.endDate}
-                            onChange={(event) =>
-                                setTrainingDetails({
-                                    ...trainingDetails,
-                                    endDate: event.target.value,
-                                })
-                            }
-                        />
-                        <div className="flex flex-col gap-3">
-                            <ActionButton
-                                label="Add Trainer to Pool"
-                                onClick={() =>
-                                    setDisplayedPoolType(UserRoleType.TRAINER)
-                                }
-                                endAdornment={
-                                    <span>({trainerPool.length} added)</span>
-                                }
-                            />
-                            <ActionButton
-                                label="Add Moderators to Pool"
-                                onClick={() =>
-                                    setDisplayedPoolType(UserRoleType.MODERATOR)
-                                }
-                                endAdornment={
-                                    <span>({moderatorPool.length} added)</span>
-                                }
-                            />
-                            <ActionButton
-                                label="Add Candidates to Pool"
-                                onClick={() =>
-                                    setDisplayedPoolType(UserRoleType.CANDIDATE)
-                                }
-                                endAdornment={
-                                    <span>({candidatePool.length} added)</span>
-                                }
-                            />
-                        </div>
-                        <div className="flex justify-end gap-4">
-                            <Button variant={ButtonType.PRIMARY} type="submit">
-                                Submit
-                            </Button>
-                            <Button variant={ButtonType.SECONDARY} onClick={() => navigate(`/adminDashboard/${userId}`)}>
-                                Cancel
-                            </Button>
-                        </div>
-                    </form>
-                </Layout>
-            );
-    }
+                        Cancel
+                    </Button>
+                </div>
+            </form>
+        </Layout>
+    );
 };
+// };
 export default CreateTraining;

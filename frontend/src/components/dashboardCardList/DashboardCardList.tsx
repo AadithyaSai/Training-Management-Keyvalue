@@ -13,7 +13,7 @@ const DashboardCardList: React.FC<DashboardCardListProps> = ({ data }) => {
                 <DashboardCard
                     key={index}
                     label={cardData.label}
-                    value={cardData.value}
+                    value={cardData.value || 0}
                     type={cardData.type}
                 />
             ))}

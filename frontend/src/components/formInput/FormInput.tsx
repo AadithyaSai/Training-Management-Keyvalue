@@ -2,13 +2,13 @@ const FormInput = ({
     name,
     label,
     type = "text",
-    value,
+    value = "",
     onChange
 }: {
     name: string;
     label: string;
     type?: string;
-    value: string;
+    value?: string;
     onChange?: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
 }) => {
     return (
