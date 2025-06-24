@@ -9,7 +9,6 @@ import Layout from "../layout/Layout";
 import Button, { ButtonType } from "../button/Button";
 import { useUpdateMultipleSessionsMutation } from "../../api-service/session/session.api";
 import { jwtDecode } from "jwt-decode";
-import { set } from "date-fns";
 
 dayjs.extend(isBetween)
 
@@ -69,7 +68,7 @@ const DraggableSession = ({
     return (
       <div
         ref={drag}
-        className={`text-white text-lg px-2 py-1 rounded mb-2 cursor-move shadow overflow-hidden ${className} hover:scale-101 transition-transform ${assignColor(session.status)}`}
+        className={`text-white text-lg px-2 py-1 w-[340px] mx-auto rounded mb-2 cursor-move shadow overflow-hidden ${className} hover:scale-101 transition-transform ${assignColor(session.status)}`}
         style={{ opacity: isDragging ? 0.5 : 1 }}
       >
         <div className="flex items-center gap-2">
@@ -78,7 +77,7 @@ const DraggableSession = ({
           </div>
         <div>
           {session.description && (
-            <span className="text-sm line-clamp-4">{session.description}</span>
+            <span className="text-sm line-clamp-4 text-wrap break-words w-full">{session.description}</span>
           )}
         </div>
         <span className="text-sm text-gray-200">{session.duration} Hrs</span>
@@ -120,7 +119,7 @@ const DroppableSessionWrapper = ({
     const x = rect.left + window.scrollX - 350;  // Adjusted for navbar
     const y = rect.top + window.scrollY - 120;  // Adjusted for header
     setPopoverDetails({
-      x: x + 10, // Offset to avoid cursor overlap
+      x: x - 30, // Offset to avoid cursor overlap
       y: y + 28,
       visible: true,
     });
@@ -223,6 +222,13 @@ const DroppablePool = ({
 
 const SessionDetailPopover = ({x, y, visible, session, onRemove, onStatusChange}: {x: number, y: number, visible: boolean, session?: any, onRemove: () => void, onStatusChange: (status: string) => void}) => {
   if (!session) return null;
+  // correct y if towards screen bottom
+  const screenHeight = window.innerHeight - 100;
+  // alert(`Screen height: ${screenHeight}, Popover Y: ${y}`);
+  const popoverHeight = 180 + 38; // height of the popover + div
+  if (y + popoverHeight > screenHeight) {
+    y -= popoverHeight - 10; // 10px padding from bottom
+  }
   return (
     <div
       className={"absolute flex flex-col justify-between bg-itemColor h-[180px] w-[500px] text-white border border-gray-300 rounded p-2 shadow-lg transition-opacity duration-300 " + (!visible ? "hidden opacity-0" : "opacity-100")}
@@ -351,6 +357,16 @@ const Calendar = () => {
 
       // From pool to calendar
       if (!session.fromCalendar) {
+        setSessionsList((prev) => {
+          const updatedSessionIdx =  prev.findIndex(
+            (s) => s.id === session.id
+          );
+          const updatedSessions = [...prev];
+          const sessionToAdd = { ...session, date: key, fromCalendar: true };
+          sessionToAdd.status = SessionStatus.SCHEDULED;
+          updatedSessions.splice(updatedSessionIdx, 1, sessionToAdd);
+          return updatedSessions;
+        });
         return {
           ...prev,
           [key]: [...existing, { ...session }],
