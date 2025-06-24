@@ -229,6 +229,9 @@ const SessionDetailPopover = ({x, y, visible, session, onRemove, onStatusChange}
   if (y + popoverHeight > screenHeight) {
     y -= popoverHeight - 10; // 10px padding from bottom
   }
+  const token = localStorage.getItem("token");
+  const isAdmin = jwtDecode(token).isAdmin;
+
   return (
     <div
       className={"absolute flex flex-col justify-between bg-itemColor h-[180px] w-[500px] text-white border border-gray-300 rounded p-2 shadow-lg transition-opacity duration-300 " + (!visible ? "hidden opacity-0" : "opacity-100")}
@@ -240,7 +243,7 @@ const SessionDetailPopover = ({x, y, visible, session, onRemove, onStatusChange}
       </div>
       <div className="flex justify-between">
         <p className="h-fit p-1">Duration: {session.duration} Hrs</p>
-          <div className="flex gap-1">
+          {isAdmin && <div className="flex gap-1">
             {session.status !== SessionStatus.DRAFT && session.status !== SessionStatus.COMPLETED &&
               <button className="bg-white text-black px-2 py-1 rounded hover:bg-gray-200" onClick={() => onStatusChange(session.status === SessionStatus.SCHEDULED ? SessionStatus.IN_PROGRESS : SessionStatus.COMPLETED)}>
                 <span>
@@ -253,7 +256,7 @@ const SessionDetailPopover = ({x, y, visible, session, onRemove, onStatusChange}
                 Move to Pool
               </button>
             }
-          </div>
+          </div>}
       </div>
     </div>
   )
@@ -384,12 +387,10 @@ const Calendar = () => {
       const removed = updated.splice(index, 1);
         setSessionsList(prev => {
           const updatedSessions = [...prev];
-          const sessionToRemove = updatedSessions.find(
+          const sessionToRemove = updatedSessions.findIndex(
             (s) => s.id === removed[0].id
           );
-          if (sessionToRemove) {
-            sessionToRemove.status = SessionStatus.DRAFT; // Reset status to Draft
-          }
+            updatedSessions[sessionToRemove].status = SessionStatus.DRAFT; // Reset status to Draft
           return updatedSessions;
         }
         );
@@ -557,12 +558,12 @@ const Calendar = () => {
                 </DroppablePool>
               </div>
               <div className="flex flex-col gap-2">
-                <Button
+                {isAdmin && <Button
                   variant={ButtonType.PRIMARY}
                   onClick={handleConfirmSchedule}
                 >
                   Confirm Schedule
-                </Button>
+                </Button>}
                 <Button
                   variant={ButtonType.SECONDARY}
                   onClick={() => navigate(-1)}

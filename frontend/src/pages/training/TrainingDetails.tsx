@@ -167,7 +167,7 @@ const TrainingDetails = () => {
 						},
 						{
 							label: "Total Progress",
-							value: `${dashboardData?.progress}`,
+							value: `${dashboardData?.progress.toFixed(0)}`,
 							type: DashboardCardType.PROGRESS,
 						},
 						{

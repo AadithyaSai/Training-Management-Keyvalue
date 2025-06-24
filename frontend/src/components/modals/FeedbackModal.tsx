@@ -29,9 +29,9 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
 
     const [createFeedback] = useCreateFeedbackMutation();
 
+    const userId = useSelector(getUserDetails).id;
     if (!isOpen) return null;
 
-    const userId = useSelector(getUserDetails).id;
 
     const handleSubmit = () => {
         const isCandidate: boolean = userRole == UserRoleType.CANDIDATE;

@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { MdOutlineSpaceDashboard } from "react-icons/md";
 import { FaRegCalendarCheck } from "react-icons/fa";
 import { removeUser, type UserStateData } from "../../store/slices/userSlice";
@@ -39,6 +39,8 @@ const Navbar: React.FC<NavbarProps> = ({ userDetails, calendarNav = true }) => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
+    const {trainingId} = useParams();
+
     const handleLogout = () => {
         localStorage.removeItem("token");
         navigate("/login", { replace: true });
@@ -78,11 +80,7 @@ const Navbar: React.FC<NavbarProps> = ({ userDetails, calendarNav = true }) => {
                     {calendarNav && <NavbarItem
                         label="Calendar"
                         icon={<FaRegCalendarCheck />}
-                        navTo={
-                            userDetails?.isAdmin
-                                ? `/adminDashboard/${userDetails?.id}`
-                                : `/dashboard/${userDetails?.id}`
-                        }
+                        navTo={`/training/${trainingId}/calendar`}
                     />}
                 </ul>
             </div>
