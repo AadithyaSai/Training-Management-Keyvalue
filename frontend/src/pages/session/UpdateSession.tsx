@@ -109,20 +109,44 @@ const UpdateSession = () => {
     const [showModeratorModal, setShowModeratorModal] = useState(false);
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
+<<<<<<< HEAD
     const navigate = useNavigate();
     const { trainingId, sessionId } = useParams();
     const { data: sessionDetailsData, isLoading: getIsLoading } =
         useGetSessionByIdQuery({
             id: sessionId,
         });
+=======
+  const navigate = useNavigate();
+  const { trainingId, sessionId } = useParams();
+  const { data: sessionDetailsData, isLoading: getIsLoading } = useGetSessionByIdQuery({
+    id: sessionId,
+  });
+>>>>>>> 072799b (fixed update session)
 
     const [updateSession, { isLoading }] = useUpdateSessionMutation();
 
+<<<<<<< HEAD
     const { data: trainingDetailsData } = useGetTrainingByIdQuery<{
         data: { members: Array<{ role: string; user: User }> };
     }>({
         id: parseInt(trainingId || "0", 10),
     });
+=======
+  const { data: trainingDetailsData } = useGetTrainingByIdQuery({
+    id: parseInt(trainingId || "0", 10),
+  });
+
+  const [trainers, setTrainers] = useState([]);
+  const [moderators, setModerators] = useState([]);
+
+  useEffect(() => {
+    if (trainingDetailsData) {
+      setTrainers(trainingDetailsData.members.filter((m)=>m.role==="trainer").map((m)=>m.user) || []);
+      setModerators(trainingDetailsData.members.filter((m)=>m.role==="moderator").map((m)=>m.user) || []);
+    }
+  }, [trainingDetailsData]);
+>>>>>>> 072799b (fixed update session)
 
     const trainers = trainingDetailsData?.members
         .filter((u) => u.role === "trainer")
@@ -171,12 +195,11 @@ const UpdateSession = () => {
             setErrors(validationErrors);
             return;
         }
-
         setErrors({});
-        updateSession({ id: sessionId, data: sessionDetails })
-            .unwrap()
-            .then(() => navigate(`/training/${trainingId}`))
-            .catch((error) => console.error(error));
+        updateSession({ id: sessionId, data: {...sessionDetails, programId: parseInt(trainingId!)} })
+          .unwrap()
+          .then(() => navigate(`/training/${trainingId}`))
+          .catch((error) => console.error(error));
     };
 
     const handleCancel = () => {
