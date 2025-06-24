@@ -1,8 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { MdOutlineSpaceDashboard } from "react-icons/md";
 import { FaRegCalendarCheck } from "react-icons/fa";
-import { useDispatch } from "react-redux";
 import { removeUser, type UserStateData } from "../../store/slices/userSlice";
+import { useDispatch } from "react-redux";
 
 interface NavbarItemProps {
     label?: string;
@@ -12,6 +12,7 @@ interface NavbarItemProps {
 
 interface NavbarProps {
     userDetails?: UserStateData;
+    calendarNav?: boolean;
 }
 
 const NavbarItem = ({
@@ -34,16 +35,15 @@ const NavbarItem = ({
     );
 };
 
-const Navbar: React.FC<NavbarProps> = ({ userDetails }) => {
+const Navbar: React.FC<NavbarProps> = ({ userDetails, calendarNav = true }) => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
     const handleLogout = () => {
         localStorage.removeItem("token");
-        dispatch(removeUser());
         navigate("/login", { replace: true });
+        dispatch(removeUser());
     };
-
 
     return (
         <nav className="fixed top-headerHeight left-0 bottom-0 w-navbarWidth bg-cardColor text-white shadow-bgColor shadow-xl py-6 z-40 border-t-transparent flex flex-col">
@@ -75,7 +75,7 @@ const Navbar: React.FC<NavbarProps> = ({ userDetails }) => {
                                 : `/dashboard/${userDetails?.id}`
                         }
                     />
-                    <NavbarItem
+                    {calendarNav && <NavbarItem
                         label="Calendar"
                         icon={<FaRegCalendarCheck />}
                         navTo={
@@ -83,7 +83,7 @@ const Navbar: React.FC<NavbarProps> = ({ userDetails }) => {
                                 ? `/adminDashboard/${userDetails?.id}`
                                 : `/dashboard/${userDetails?.id}`
                         }
-                    />
+                    />}
                 </ul>
             </div>
 

@@ -41,6 +41,7 @@ const AdminDashboard = () => {
         <Layout
             title="Admin Dashboard"
             isLoading={!userAuthenticated || isCardDataLoading || isLoading}
+            calendarNav={false}
         >
             <div className="flex flex-col items-center justify-center gap-10 p-5">
                 <DashboardCardList

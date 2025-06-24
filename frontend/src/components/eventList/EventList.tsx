@@ -87,7 +87,7 @@ const EventListItem: React.FC<EventItem> = ({ item, eventType }) => {
                 <p className="text-sm mt-1 text-gray-400">{item.description}</p>
                 {eventType == EventListType.SESSION ? (
                     <p className="text-sm mt-1 text-white">
-                        Date : {dayjs(item.date).format("DD/MM/YYYY")}
+                        {item?.date && `Date : ${dayjs(item.date).format("DD/MM/YYYY")}`}
                     </p>
                 ) : (
                     <>

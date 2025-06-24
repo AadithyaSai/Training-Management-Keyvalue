@@ -15,7 +15,7 @@ const CommonDashboard = () => {
             userDashboardData?.totalPrograms.length) *
         100).toFixed(0));
     return (
-        <Layout title="Dashboard" isLoading={isLoading}>
+        <Layout title="Dashboard" isLoading={isLoading} calendarNav={false}>
             <div className="flex flex-col items-center justify-center gap-10 p-5">
                 <DashboardCardList
                     data={[

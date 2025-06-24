@@ -9,7 +9,6 @@ import {
     type UserStateData,
 } from "../../store/slices/userSlice";
 import { jwtDecode } from "jwt-decode";
-import { use, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 interface LayoutProps {
@@ -17,6 +16,7 @@ interface LayoutProps {
     children?: React.ReactNode;
     endAdornments?: React.ReactNode;
     isLoading?: boolean;
+    calendarNav?: boolean;
     userRole?: UserRole;
 }
 
@@ -63,13 +63,18 @@ const Layout: React.FC<LayoutProps> = ({
     title,
     children,
     endAdornments,
+    calendarNav,
     isLoading,
 }) => {
     const navigate = useNavigate();
     const userDetails = validateToken();
+
+
     if (!userDetails) {
         return <PacmanFullScreen />;
-    } else if (!userDetails.data) {
+    }
+    
+    if (!userDetails.data) {
         navigate("/login");
     }
 
@@ -77,7 +82,7 @@ const Layout: React.FC<LayoutProps> = ({
         <div className="flex flex-col min-h-screen bg-bgColor">
             <ToastContainer toastClassName="custom-toast" />
             <Header title={title} endAdornments={endAdornments} />
-            <Navbar userDetails={userDetails.data} />
+            <Navbar userDetails={userDetails.data} calendarNav={calendarNav}/>
             <div className="flex mt-headerHeight h-bodyHeight">
                 <div className="w-full relative ml-navbarWidth">
                     <LightEffect />

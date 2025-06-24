@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
+    useAddMembersToSessionMutation,
     useDeleteSessionMutation,
     useGetSessionByIdQuery,
 } from "../../api-service/session/session.api";
 import { useGetUserRoleInSessionQuery } from "../../api-service/user/user.api";
-import { useGetFeedbackListQuery, useGetFeedbacksBySessionIdQuery } from "../../api-service/feedback/feedback.api";
+import { useGetFeedbacksBySessionIdQuery } from "../../api-service/feedback/feedback.api";
 import Layout from "../../components/layout/Layout";
 import { SessionContent } from "./components/SessionContent";
 import { SessionActionButtons } from "./components/SessionActionButtons";
@@ -20,6 +21,14 @@ import {
     getUserDetails,
     type UserStateData,
 } from "../../store/slices/userSlice";
+import { useGetTrainingByIdQuery } from "../../api-service/training/training.api";
+
+interface TrainingUserPoolDetails {
+    isTrainer: boolean;
+    isModerator: boolean;
+    isUserInTrainerPool: boolean;
+    isUserInModeratorPool: boolean;
+}
 
 const SessionDetails = () => {
     const [sessionDetails, setSessionDetails] = useState<SessionData>({
@@ -30,25 +39,51 @@ const SessionDetails = () => {
         materialQualityFeedback: "",
         sessionFeedback: "",
     });
-    
+
+    const [trainingUserDetails, setTrainingUserDetails] =
+        useState<TrainingUserPoolDetails>({
+            isTrainer: false,
+            isModerator: false,
+            isUserInTrainerPool: false,
+            isUserInModeratorPool: false,
+        });
+
     const navigate = useNavigate();
     const { trainingId, sessionId } = useParams();
+    const userDetails: UserStateData = useSelector(getUserDetails);
+    const { isAdmin, id: userId } = userDetails;
+
     const { data: sessionDetailsData } = useGetSessionByIdQuery({
         id: sessionId,
     });
-    const { data: feedbackList } = useGetFeedbacksBySessionIdQuery({ sessionId });
+    const { data: trainingDetailsData } = useGetTrainingByIdQuery({
+        id: trainingId,
+    });
+    const { data: feedbackList } = useGetFeedbacksBySessionIdQuery({
+        sessionId,
+    });
+    const [addUsers] = useAddMembersToSessionMutation();
     const [deleteSession, { isLoading }] = useDeleteSessionMutation();
+    const { data: userRole } = useGetUserRoleInSessionQuery({
+        sessionId,
+        userId,
+    });
+
+    const handleEnrollSelf = (role: UserRole) => {
+        addUsers({ id: sessionId, members: [{ id: userId, role }] })
+            .unwrap()
+            .then(() => console.log("Completed"))
+            .catch((error) => console.log(error));
+    };
 
     useEffect(() => {
         if (!sessionDetailsData) return;
-
         const sessionUserDetails = sessionDetailsData.userSessions.map(
             (userSession: {
-                id: number;
                 role: UserRole;
-                user: { name: string };
+                user: { id: number, name: string };
             }) => ({
-                id: userSession.id,
+                id: userSession.user.id,
                 role: userSession.role,
                 name: userSession.user.name,
             })
@@ -60,6 +95,9 @@ const SessionDetails = () => {
             (user: { role: UserRole }) => user.role === UserRoleType.MODERATOR
         );
 
+        {
+            /* Collecting the data of trainer and moderators of the this session from database to the state */
+        }
         setSessionDetails({
             trainer,
             moderators: [...moderators],
@@ -73,12 +111,45 @@ const SessionDetails = () => {
         });
     }, [sessionDetailsData]);
 
-    const userDetails: UserStateData = useSelector(getUserDetails);
-    const { isAdmin, id: userId } = userDetails;
-    const { data: userRole } = useGetUserRoleInSessionQuery({
-        userId,
-        sessionId,
-    });
+    {
+        /* Collecting the pool of whether this user is in trainers or moderators pool  of this training 
+        from database to the state */
+    }
+    useEffect(() => {
+        if (!trainingDetailsData || !sessionDetails) return;
+
+        const isTrainer: boolean =
+            sessionDetails?.trainer?.id === Number(userId);
+
+        const isModerator: boolean = Boolean(
+            sessionDetails.moderators?.find(
+                (moderator) => Number(moderator.id) === Number(userId)
+            )
+        );
+
+        console.log(sessionDetails?.trainer);
+
+        const isUserInTrainerPool: boolean =
+            trainingDetailsData.members.filter(
+                (member: { role: UserRole; user: { id: number } }) =>
+                    member.user.id === userId &&
+                    member.role === UserRoleType.TRAINER
+            ).length > 0;
+
+        const isUserInModeratorPool: boolean =
+            trainingDetailsData.members.filter(
+                (member: { role: UserRole; user: { id: number } }) =>
+                    member.user.id === userId &&
+                    member.role === UserRoleType.MODERATOR
+            ).length > 0;
+
+        setTrainingUserDetails({
+            isTrainer,
+            isModerator,
+            isUserInTrainerPool,
+            isUserInModeratorPool,
+        });
+    }, [trainingDetailsData, sessionDetails]);
 
     return (
         <Layout
@@ -113,6 +184,17 @@ const SessionDetails = () => {
                         <SessionContent
                             isAdmin={isAdmin}
                             sessionData={sessionDetails}
+                            isTrainerAssignable={
+                                !sessionDetails.trainer &&
+                                trainingUserDetails.isUserInTrainerPool &&
+                                !trainingUserDetails.isModerator
+                            }
+                            isModeratorAssignable={
+                                !trainingUserDetails.isModerator &&
+                                trainingUserDetails.isUserInModeratorPool &&
+                                !trainingUserDetails.isTrainer
+                            }
+                            handleEnrollSelf={handleEnrollSelf}
                         />
 
                         {/* Action Buttons */}
