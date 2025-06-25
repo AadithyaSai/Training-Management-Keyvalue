@@ -25,13 +25,11 @@ You are an expert analyst. Summarize the following {role_name} feedback points i
     return response.choices[0].message.content.strip()
 
 def hierarchical_summarize(feedback_list, role_name):
-    # Step 1 & 2: Chunk & summarize each chunk
     chunk_summaries = []
     for chunk in chunk_list(feedback_list, chunk_size=10):
         summary = summarize_chunk(chunk, role_name)
         chunk_summaries.append(summary)
     
-    # Step 3 & 4: Summarize combined chunk summaries if more than 1 chunk
     if len(chunk_summaries) == 1:
         return chunk_summaries[0]
     else:
@@ -65,15 +63,9 @@ Please provide:An integrated analysis highlighting the overall perfomance of tra
     )
     return response.choices[0].message.content.strip()
 
-# Putting it all together
 
 def analyze_large_feedback(student_feedback):
     student_summary = hierarchical_summarize(student_feedback, "student")
     return student_summary
 
 
-# Example usage
-
-
-# report = analyze_large_feedback(student_feedback, trainer_moderator_feedback)
-# print(report)

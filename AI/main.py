@@ -26,7 +26,6 @@ class FeedbackInput(BaseModel):
 @app.post("/material-feedback")
 def get_material_feedback(data: SessionMaterialInput):
     print(f"Received data: {data}")
-    # Replace with your real logic
     try:
         material_feedback = analyze_session(data.list_of_urls, data.topic, data.description)
 
